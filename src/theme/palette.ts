@@ -1,0 +1,15 @@
+export const PALETTE = {
+  indigo: '#1a1b3a',
+  indigoDeep: '#0f102b',
+  indigoMid: '#2d2b5f',
+  saffron: '#e8a838',
+  saffronBright: '#f4c257',
+  saffronDeep: '#c67a1a',
+  cream: '#faf5eb',
+  creamSoft: '#f5ecd8',
+  rose: '#c97b63',
+  slate: '#3a3b5c',
+  slateLocked: '#4a4b6e',
+  textOnDark: '#f5ecd8',
+  textOnDarkMuted: 'rgba(245,236,216,0.62)',
+} as const;

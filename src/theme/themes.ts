@@ -1,0 +1,78 @@
+/** Dark theme — indigo & saffron (default app experience) */
+export const darkTheme = {
+  mode: 'dark' as const,
+  background: '#0f102b',
+  backgroundAlt: '#1a1b3a',
+  gradientStart: '#0f102b',
+  gradientMid: '#1a1b3a',
+  gradientEnd: '#2d2b5f',
+  surface: '#1a1b3a',
+  surfaceSoft: 'rgba(245,236,216,0.06)',
+  card: '#ffffff',
+  cardBorder: 'rgba(245,236,216,0.14)',
+  text: '#f5ecd8',
+  textMuted: 'rgba(245,236,216,0.62)',
+  textOnAccent: '#0f102b',
+  accent: '#e8a838',
+  accentBright: '#f4c257',
+  accentDeep: '#c67a1a',
+  accentSoft: 'rgba(232, 168, 56, 0.22)',
+  accentBorder: 'rgba(232,168,56,0.55)',
+  blush: 'rgba(232,168,56,0.14)',
+  mandalaStroke: '#f4c257',
+  progressTrack: 'rgba(245,236,216,0.18)',
+  progressFill: '#f4c257',
+  iconButtonBg: 'rgba(245,236,216,0.1)',
+  iconStroke: '#f5ecd8',
+  featuredGradient: ['#1a1b3a', '#2d2b5f'] as const,
+  ctaGradient: ['#f4c257', '#e8a838', '#c67a1a'] as const,
+  ctaText: '#0f102b',
+  tabBarBg: '#0f102b',
+  tabBarBorder: 'rgba(245,236,216,0.08)',
+  tabActive: '#f4c257',
+  tabInactive: 'rgba(245,236,216,0.62)',
+  statusBar: 'light' as const,
+};
+
+/** Light lotus theme — soft white & pink */
+export const lightLotusTheme = {
+  mode: 'light' as const,
+  background: '#FFFBFC',
+  backgroundAlt: '#FFF5F8',
+  gradientStart: '#FFFFFF',
+  gradientMid: '#FFF5F8',
+  gradientEnd: '#FFE8F0',
+  surface: '#FFFFFF',
+  surfaceSoft: '#FFF9FB',
+  card: '#FFFFFF',
+  cardBorder: 'rgba(232, 164, 184, 0.22)',
+  text: '#5C3D4A',
+  textMuted: 'rgba(92, 61, 74, 0.62)',
+  textOnAccent: '#FFFFFF',
+  accent: '#E8A4B8',
+  accentBright: '#F0B8C8',
+  accentDeep: '#D9869A',
+  accentSoft: 'rgba(232, 164, 184, 0.22)',
+  accentBorder: 'rgba(232, 164, 184, 0.45)',
+  blush: '#FFEEF3',
+  mandalaStroke: '#E8A4B8',
+  progressTrack: 'rgba(232, 164, 184, 0.28)',
+  progressFill: '#E8A4B8',
+  iconButtonBg: 'rgba(232, 164, 184, 0.18)',
+  iconStroke: '#5C3D4A',
+  featuredGradient: ['#FAD9E3', '#E8A4B8'] as const,
+  ctaGradient: ['#FAD9E3', '#F0B8C8', '#E8A4B8'] as const,
+  ctaText: '#5C3D4A',
+  tabBarBg: '#FFFBFC',
+  tabBarBorder: 'rgba(232, 164, 184, 0.22)',
+  tabActive: '#D9869A',
+  tabInactive: 'rgba(92, 61, 74, 0.45)',
+  statusBar: 'dark' as const,
+};
+
+export type AppTheme = typeof darkTheme | typeof lightLotusTheme;
+export type ThemeMode = AppTheme['mode'];
+
+export function getTheme(mode: ThemeMode): AppTheme {
+  return mode === 'light' ? lightLotusTheme : darkTheme;
+}
