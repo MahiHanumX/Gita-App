@@ -49,7 +49,7 @@ export function PathScreen() {
 
   useEffect(() => {
     const targetNode = nodes.find((n) => n.state === 'active') || nodes[0];
-    
+
     if (prevDayRef.current !== currentDay) {
       Animated.parallel([
         Animated.timing(moveAnim, {
@@ -139,16 +139,6 @@ export function PathScreen() {
             );
           })}
 
-          {nodes.map((n) => (
-            <Pressable
-              key={n.day}
-              onPress={() => n.state === 'active' && setSheetOpen(true)}
-              style={{ position: 'absolute', left: n.x, top: n.y }}
-            >
-              <PathNode state={n.state} day={n.state === 'active' ? n.day : undefined} />
-            </Pressable>
-          ))}
-
           <Animated.Image
             source={require('../../../assets/rath-wheel.png')}
             style={[
@@ -157,16 +147,26 @@ export function PathScreen() {
                 transform: [
                   { translateX: moveAnim.x },
                   { translateY: moveAnim.y },
-                  { translateX: 42 }, // Offset to the right of the node center so it does not hide the active day details
-                  { translateY: -28 }, // Center offset
+                  { translateX: -42 }, // Centered offset (half of width 84)
+                  { translateY: -42 }, // Centered offset (half of height 84)
                   { rotate: rotation },
-                  { rotateX: '35deg' }, // Tilt the wheel to look 3D
+                  { rotateX: '35deg' }, // 3D tilt
                   { rotateY: '-15deg' },
                 ],
               },
             ]}
             resizeMode="contain"
           />
+
+          {nodes.map((n) => (
+            <Pressable
+              key={n.day}
+              onPress={() => n.state === 'active' && setSheetOpen(true)}
+              style={{ position: 'absolute', left: n.x, top: n.y, zIndex: 2 }}
+            >
+              <PathNode state={n.state} day={n.state === 'active' ? n.day : undefined} />
+            </Pressable>
+          ))}
         </View>
       </ScrollView>
 
@@ -398,8 +398,8 @@ const styles = StyleSheet.create({
   },
   rathWheel: {
     position: 'absolute',
-    width: 56,
-    height: 56,
-    zIndex: 10,
+    width: 84,
+    height: 84,
+    zIndex: 1,
   },
 });
