@@ -1,5 +1,5 @@
-import { useMemo, useState, useRef, useEffect } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, Animated, Easing } from 'react-native';
+import { useMemo, useState, useEffect } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
@@ -42,41 +42,6 @@ export function PathScreen() {
   const lockedPathColor = resolvedMode === 'light' ? theme.progressTrack : '#4a4b6e';
   const completedPathColor = theme.accent;
   const activePathColor = theme.accentBright;
-
-  const moveAnim = useRef(new Animated.ValueXY({ x: activeNode.x, y: activeNode.y })).current;
-  const rotateAnim = useRef(new Animated.Value(0)).current;
-  const prevDayRef = useRef(currentDay);
-
-  useEffect(() => {
-    const targetNode = nodes.find((n) => n.state === 'active') || nodes[0];
-
-    if (prevDayRef.current !== currentDay) {
-      Animated.parallel([
-        Animated.timing(moveAnim, {
-          toValue: { x: targetNode.x, y: targetNode.y },
-          duration: 1500,
-          easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-          useNativeDriver: true,
-        }),
-        Animated.timing(rotateAnim, {
-          toValue: 1,
-          duration: 1500,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        rotateAnim.setValue(0);
-      });
-      prevDayRef.current = currentDay;
-    } else {
-      moveAnim.setValue({ x: targetNode.x, y: targetNode.y });
-    }
-  }, [currentDay, nodes]);
-
-  const rotation = rotateAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '1080deg'],
-  });
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
@@ -138,25 +103,6 @@ export function PathScreen() {
               />
             );
           })}
-
-          <Animated.Image
-            source={require('../../../assets/rath-wheel.png')}
-            style={[
-              styles.rathWheel,
-              {
-                transform: [
-                  { translateX: moveAnim.x },
-                  { translateY: moveAnim.y },
-                  { translateX: -42 }, // Centered offset (half of width 84)
-                  { translateY: -42 }, // Centered offset (half of height 84)
-                  { rotate: rotation },
-                  { rotateX: '35deg' }, // 3D tilt
-                  { rotateY: '-15deg' },
-                ],
-              },
-            ]}
-            resizeMode="contain"
-          />
 
           {nodes.map((n) => (
             <Pressable
@@ -395,11 +341,5 @@ const styles = StyleSheet.create({
   metaText: {
     fontFamily: 'Poppins_500Medium',
     fontSize: 12,
-  },
-  rathWheel: {
-    position: 'absolute',
-    width: 84,
-    height: 84,
-    zIndex: 1,
   },
 });
