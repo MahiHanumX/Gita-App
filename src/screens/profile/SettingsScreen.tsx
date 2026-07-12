@@ -29,7 +29,7 @@ export function SettingsScreen({ navigation }: Props) {
 
         <ScrollView style={styles.scrollArea} showsVerticalScrollIndicator={false}>
           <SettingsGroup title="Practice · अभ्यास">
-            <SettingsRow icon="clock" label="Daily reminder" value="7:00 AM · daily" chevron />
+            <SettingsRow icon="clock" label="Daily reminder" value="7:00 AM · daily" chevron onPress={() => navigation.navigate('Reminder')} />
             <SettingsRow icon="time" label="Session length" value="Steady · 10 min" chevron />
             <SettingsRow icon="pause" label="Rest days" value="Sundays" chevron />
           </SettingsGroup>
@@ -63,13 +63,13 @@ function SettingsGroup({ title, children }: any) {
   );
 }
 
-function SettingsRow({ icon, label, value, toggle, on: initialOn, chevron }: any) {
+function SettingsRow({ icon, label, value, toggle, on: initialOn, chevron, onPress }: any) {
   const [on, setOn] = useState(initialOn);
   const { theme } = useTheme();
   const styles = useMemo(() => getStyles(theme), [theme]);
 
   return (
-    <Pressable style={styles.rowWrap} onPress={() => { if (toggle) setOn(!on); }}>
+    <Pressable style={styles.rowWrap} onPress={() => { if (toggle) setOn(!on); else if (onPress) onPress(); }}>
       <View style={styles.iconBox}>
         <SettingsIcon name={icon} />
       </View>

@@ -40,7 +40,7 @@ export function CompleteChapterScreen({ navigation }: Props) {
 
   const { complete } = practice;
 
-  const flameColor = isLight ? '#D9869A' : '#ffe08a';
+  const flameColor = isLight ? theme.accentDeep : theme.accentBright;
 
   // Soft gold vibrating glow animation
   const glowScale = pulseAnim.interpolate({
@@ -73,26 +73,12 @@ export function CompleteChapterScreen({ navigation }: Props) {
     >
       <ChapterChip hindi={complete.chipHi} english={complete.chipEn} />
       <View style={styles.lampWrap}>
-        {/* Pulsing Gold Glow Circle */}
-        <Animated.View
-          style={[
-            styles.vibratingGlow,
-            {
-              transform: [{ scale: glowScale }],
-              opacity: glowOpacity,
-            },
-          ]}
-        />
-        {/* Deepak Image */}
         <Image
-          source={require('../../../assets/deepak.png')}
+          source={require('../../../assets/diya_01.png')}
           style={styles.deepakImage}
           resizeMode="contain"
         />
         {/* DiyaIcon on top, outer layer color transparent to keep only the flame */}
-        <View style={styles.diyaOverlay}>
-          <DiyaIcon size={80} lit color="transparent" flameColor={flameColor} />
-        </View>
       </View>
       <Text style={[styles.title, { color: theme.text }]}>{complete.title}</Text>
       <Text style={[styles.hindi, { color: refColor }]}>{complete.hindiTitle}</Text>
@@ -119,20 +105,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 15,
     zIndex: 3,
-  },
-  vibratingGlow: {
-    position: 'absolute',
-    top: 25,
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#ffd670',
-    shadowColor: '#f4c257',
-    shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 15,
-    shadowOpacity: 0.8,
-    elevation: 6,
-    zIndex: 1,
   },
   title: {
     marginTop: 34,

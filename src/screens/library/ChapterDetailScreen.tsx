@@ -16,6 +16,7 @@ import { LibraryStackParamList } from '../../navigation/types';
 import { useLocale, useTranslation } from '../../i18n';
 import { useLibraryContent } from '../../api_data/hooks';
 import { useTheme } from '../../theme';
+import { MandalaBG } from '../../components/MandalaBG';
 
 type Props = NativeStackScreenProps<LibraryStackParamList, 'ChapterDetail'>;
 
@@ -40,13 +41,21 @@ export function ChapterDetailScreen({ route, navigation }: Props) {
 
   const gradientColors = (isLight
     ? [theme.gradientMid, theme.gradientEnd]
-    : [PALETTE.indigoDeep, '#3a2358']) as [string, string];
+    : [theme.gradientStart, theme.gradientEnd]) as [string, string];
 
-  const strokeColor = isLight ? theme.mandalaStroke : PALETTE.saffronBright;
-  const backIconColor = isLight ? theme.text : PALETTE.cream;
+  const strokeColor = isLight ? theme.mandalaStroke : theme.accentBright;
+  const backIconColor = isLight ? theme.text : theme.text;
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
+      <MandalaBG
+        opacity={isLight ? 0.03 : 0.055}
+        from={theme.gradientStart}
+        via={theme.gradientMid}
+        to={theme.gradientEnd}
+        stroke={theme.mandalaStroke}
+        glowColor={theme.accentSoft}
+      />
       {/* Dark-gradient Header */}
       <View style={styles.headerContainer}>
         <LinearGradient
@@ -127,7 +136,7 @@ export function ChapterDetailScreen({ route, navigation }: Props) {
           {/* Chapter titles */}
           <View style={styles.titlesWrap}>
             <Text style={[styles.titleHi, { color: theme.text }]}>{titleHi}</Text>
-            <Text style={[styles.titleEn, { color: isLight ? theme.accentDeep : PALETTE.saffronBright }]}>{titleEn}</Text>
+            <Text style={[styles.titleEn, { color: isLight ? theme.accentDeep : theme.accentBright }]}>{titleEn}</Text>
 
             {/* Metadata pills */}
             <View style={styles.pillsRow}>
@@ -152,7 +161,7 @@ export function ChapterDetailScreen({ route, navigation }: Props) {
       </View>
 
       {/* Verses list body */}
-      <View style={[styles.body, { backgroundColor: theme.background }]}>
+      <View style={[styles.body, { backgroundColor: 'transparent' }]}>
         <Text style={[styles.bodyHeaderLabel, { color: theme.textMuted }]}>
           {tr.common.verses}
         </Text>
@@ -163,8 +172,17 @@ export function ChapterDetailScreen({ route, navigation }: Props) {
           contentContainerStyle={styles.listScroll}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <View
-              style={[
+            <Pressable
+              onPress={() =>
+                navigation.navigate('VerseDetail', {
+                  chapterId,
+                  verseNum: item.n,
+                  hi: item.hi,
+                  en: item.en,
+                  isKeyVerse: item.key,
+                })
+              }
+              style={({ pressed }) => [
                 styles.verseCard,
                 {
                   backgroundColor: theme.surface,
@@ -173,6 +191,7 @@ export function ChapterDetailScreen({ route, navigation }: Props) {
                   shadowOpacity: isLight ? 0.05 : 0.4,
                 },
                 item.key && [styles.verseCardKey, { borderColor: theme.accentBorder }],
+                pressed && { opacity: 0.8 },
               ]}
             >
               <View style={styles.verseNumWrap}>
@@ -195,7 +214,7 @@ export function ChapterDetailScreen({ route, navigation }: Props) {
                   <Text style={[styles.keyBadgeText, { color: theme.accentDeep }]}>{tr.common.keyVerse}</Text>
                 </View>
               )}
-            </View>
+            </Pressable>
           )}
         />
       </View>

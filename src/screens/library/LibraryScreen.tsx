@@ -10,6 +10,7 @@ import { useLibraryContent } from '../../api_data/hooks';
 import { useLocale, useTranslation } from '../../i18n';
 import { useTheme } from '../../theme';
 import { LibraryStackParamList } from '../../navigation/types';
+import { useSavedVerses } from '../../api_data/SavedVersesContext';
 
 type ChipType = 'All' | 'Chapters' | 'Themes' | 'Saved';
 
@@ -19,6 +20,7 @@ export function LibraryScreen() {
   const { language } = useLocale();
   const { theme, resolvedMode } = useTheme();
   const isLight = resolvedMode === 'light';
+  const { savedVerses } = useSavedVerses();
   
   const navigation = useNavigation<NativeStackNavigationProp<LibraryStackParamList>>();
   const [selectedChip, setSelectedChip] = useState<ChipType>('All');
@@ -47,11 +49,74 @@ export function LibraryScreen() {
       );
     }
     if (selectedChip === 'Saved') {
+      if (savedVerses.length === 0) {
+        return (
+          <View style={styles.placeholderWrap}>
+            <Text style={[styles.placeholderText, { color: theme.textMuted }]}>
+              {language === 'hi' ? 'सहेजे गए श्लोक यहाँ दिखाई देंगे।' : 'Saved verses will appear here.'}
+            </Text>
+          </View>
+        );
+      }
+
       return (
-        <View style={styles.placeholderWrap}>
-          <Text style={[styles.placeholderText, { color: theme.textMuted }]}>
-            {language === 'hi' ? 'सहेजे गए श्लोक यहाँ दिखाई देंगे।' : 'Saved verses will appear here.'}
+        <View style={styles.listContainer}>
+          <Text style={[styles.sectionLabel, { color: theme.textMuted }]}>
+            {savedVerses.length} {language === 'hi' ? 'सहेजे गए श्लोक' : 'Saved Verses'}
           </Text>
+          {savedVerses.map((v) => (
+            <Pressable
+              key={`${v.chapterId}-${v.verseNum}`}
+              onPress={() =>
+                navigation.navigate('VerseDetail', {
+                  chapterId: v.chapterId,
+                  verseNum: v.verseNum,
+                  hi: v.hi,
+                  en: v.en,
+                  isKeyVerse: v.isKeyVerse,
+                })
+              }
+              style={({ pressed }) => [
+                styles.chapterCard,
+                {
+                  backgroundColor: theme.surface,
+                  borderColor: theme.cardBorder,
+                  shadowColor: isLight ? '#E8A4B8' : '#000000',
+                  shadowOpacity: isLight ? 0.12 : 0.45,
+                },
+                pressed && { opacity: 0.8 },
+              ]}
+            >
+              <View
+                style={[
+                  styles.chapterNum,
+                  { backgroundColor: theme.accentSoft },
+                ]}
+              >
+                <Text style={[styles.chapterNumText, { color: theme.accentDeep }]}>
+                  {v.chapterId}.{v.verseNum}
+                </Text>
+              </View>
+              <View style={styles.chapterBody}>
+                <Text numberOfLines={1} style={[styles.chapterHi, { color: theme.text }]}>
+                  {v.hi.replace(/\n/g, ' ')}
+                </Text>
+                <Text numberOfLines={1} style={[styles.chapterEn, { color: theme.textMuted }]}>
+                  {v.en}
+                </Text>
+              </View>
+              <Svg width="8" height="14" viewBox="0 0 8 14">
+                <Path
+                  d="M1 1 L 7 7 L 1 13"
+                  stroke={theme.textMuted}
+                  strokeWidth="2"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </Svg>
+            </Pressable>
+          ))}
         </View>
       );
     }
@@ -154,7 +219,18 @@ export function LibraryScreen() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Featured Card */}
         {selectedChip === 'All' && (
-          <View style={styles.featuredWrap}>
+          <Pressable
+            onPress={() =>
+              navigation.navigate('VerseDetail', {
+                chapterId: 4,
+                verseNum: 7,
+                hi: verseOfDay.shloka,
+                en: verseOfDay.quote,
+                isKeyVerse: true,
+              })
+            }
+            style={({ pressed }) => [styles.featuredWrap, pressed && { opacity: 0.95 }]}
+          >
             <LinearGradient
               colors={[...theme.featuredGradient]}
               start={{ x: 0, y: 0 }}
@@ -171,7 +247,7 @@ export function LibraryScreen() {
                 <Text style={[styles.readIndicator, { color: theme.text }]}>Read →</Text>
               </View>
             </LinearGradient>
-          </View>
+          </Pressable>
         )}
 
         {/* Filter Chips */}

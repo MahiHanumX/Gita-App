@@ -318,14 +318,14 @@ export function MilestoneCompleteScreen({ route, navigation }: Props) {
     navigation.getParent()?.goBack();
   };
 
-  const activeColor = isLight ? theme.accentDeep : PALETTE.saffronBright;
+  const activeColor = isLight ? theme.accentDeep : theme.accentBright;
   const shareBg = isLight ? 'rgba(92,61,74,0.06)' : 'rgba(245,236,216,0.08)';
   const shareBorder = isLight ? 'rgba(92,61,74,0.12)' : 'rgba(245,236,216,0.18)';
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
       <MandalaBG
-        opacity={isLight ? 0.035 : 0.06}
+        opacity={isLight ? 0.03 : 0.055}
         from={theme.gradientStart}
         via={theme.gradientMid}
         to={theme.gradientEnd}

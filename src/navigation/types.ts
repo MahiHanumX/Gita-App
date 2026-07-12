@@ -34,6 +34,7 @@ export type LibraryStackParamList = {
   LibraryHome: undefined;
   ChapterDetail: { chapterId: number; titleHi: string; titleEn: string; verses: number };
   Search: undefined;
+  VerseDetail: { chapterId: number; verseNum: number; hi: string; en: string; isKeyVerse?: boolean };
 };
 
 export type ProfileStackParamList = {

@@ -60,7 +60,7 @@ export function WelcomeScreen({ navigation }: Props) {
             }[language] || 'Just 5 to 10 minutes a day is all it takes.',
         },
         {
-            logo: require('../../../assets/icon.png'),
+            logo: require('../../../assets/Bhagwat.png'),
             title: {
                 en: 'Find clarity in action, peace in outcomes.',
                 hi: 'कर्म में स्पष्टता, परिणाम में शांति।',

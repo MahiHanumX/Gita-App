@@ -10,7 +10,6 @@ import { useTranslation } from '../../i18n';
 import { signIn } from '../../api_data/services';
 import type { AuthProvider } from '../../api_data/types';
 import { OnboardingStackParamList, RootStackParamList } from '../../navigation/types';
-import { PALETTE } from '../../theme/palette';
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<OnboardingStackParamList, 'SignIn'>,
@@ -21,7 +20,7 @@ export function SignInScreen({ navigation }: Props) {
   const { data } = useAuthContent();
   const t = useTranslation();
   const { resolvedMode, theme } = useTheme();
-  
+
   if (!data) return null;
 
   const enterApp = async (provider: AuthProvider) => {
@@ -82,8 +81,8 @@ function AuthButton({
   theme: any;
   resolvedMode: string;
 }) {
-  const buttonBgColor = resolvedMode === 'light' ? theme.surfaceSoft : PALETTE.cream;
-  const buttonTextColor = resolvedMode === 'light' ? theme.text : PALETTE.indigoDeep;
+  const buttonBgColor = resolvedMode === 'light' ? theme.surfaceSoft : theme.surface;
+  const buttonTextColor = resolvedMode === 'light' ? theme.text : theme.background;
 
   return (
     <Pressable
@@ -154,7 +153,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontFamily: 'NotoSansDevanagari_400Regular',
     fontSize: 18,
-    color: PALETTE.saffronBright,
   },
   desc: {
     marginTop: 14,

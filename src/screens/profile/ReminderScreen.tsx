@@ -1,5 +1,14 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
+import React, { useMemo, useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  Modal,
+  FlatList,
+  Animated,
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { ProfileStackParamList } from '../../navigation/types';
 import { useTheme } from '../../theme';
@@ -8,15 +17,105 @@ import { LightShell } from '../../components/LightShell';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { DiyaIcon } from '../../components/DiyaIcon';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'Reminder'>;
+
+const STORAGE_KEY = '@reminder_settings';
+
+const SOUND_OPTIONS = [
+  { id: 'temple', label: 'Temple bell', labelHi: 'मंदिर घंटा' },
+  { id: 'conch', label: 'Conch shell', labelHi: 'शंख' },
+  { id: 'flute', label: 'Krishna flute', labelHi: 'कृष्ण बाँसुरी' },
+  { id: 'mantra', label: 'Om mantra', labelHi: 'ॐ मंत्र' },
+  { id: 'silent', label: 'Silent', labelHi: 'मौन' },
+];
+
+const DAY_LABELS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const DAY_FULL = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export function ReminderScreen({ navigation }: Props) {
   const { theme } = useTheme();
   const styles = useMemo(() => getStyles(theme), [theme]);
 
-  const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-  const active = [1, 1, 1, 1, 1, 0, 1];
+  const [hour, setHour] = useState(7);
+  const [minute, setMinute] = useState(0);
+  const [isAM, setIsAM] = useState(true);
+  const [activeDays, setActiveDays] = useState([true, true, true, true, true, false, true]);
+  const [preBell, setPreBell] = useState(true);
+  const [soundId, setSoundId] = useState('temple');
+  const [showSoundModal, setShowSoundModal] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const s = JSON.parse(raw);
+          if (s.hour !== undefined) setHour(s.hour);
+          if (s.minute !== undefined) setMinute(s.minute);
+          if (s.isAM !== undefined) setIsAM(s.isAM);
+          if (s.activeDays) setActiveDays(s.activeDays);
+          if (s.preBell !== undefined) setPreBell(s.preBell);
+          if (s.soundId) setSoundId(s.soundId);
+        }
+      } catch (_) {}
+    })();
+  }, []);
+
+  const adjustHour = (delta: number) => {
+    setHour(h => {
+      const next = h + delta;
+      if (next > 12) return 1;
+      if (next < 1) return 12;
+      return next;
+    });
+  };
+
+  const adjustMinute = (delta: number) => {
+    setMinute(m => {
+      const next = m + delta;
+      if (next >= 60) return 0;
+      if (next < 0) return 55;
+      return next;
+    });
+  };
+
+  const toggleDay = (i: number) => {
+    setActiveDays(prev => {
+      const next = [...prev];
+      next[i] = !next[i];
+      return next;
+    });
+  };
+
+  const currentSound = SOUND_OPTIONS.find(s => s.id === soundId) ?? SOUND_OPTIONS[0];
+
+  const [saved, setSaved] = useState(false);
+  const savedOpacity = useMemo(() => new Animated.Value(0), []);
+
+  const saveSettings = async () => {
+    try {
+      await AsyncStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ hour, minute, isAM, activeDays, preBell, soundId }),
+      );
+    } catch (_) {}
+    setSaved(true);
+    savedOpacity.setValue(1);
+    Animated.sequence([
+      Animated.delay(800),
+      Animated.timing(savedOpacity, { toValue: 0, duration: 400, useNativeDriver: true }),
+    ]).start(() => {
+      setSaved(false);
+      navigation.goBack();
+    });
+  };
+
+  const displayHour = String(hour).padStart(2, '0');
+  const displayMin = String(minute).padStart(2, '0');
+  const activeDayNames = DAY_FULL.filter((_, i) => activeDays[i]).join(', ') || 'No days';
+  const isBrahmaMuhurta = isAM && (hour === 5 || hour === 6 || (hour === 7 && minute === 0));
 
   return (
     <LightShell glow={false}>
@@ -33,18 +132,43 @@ export function ReminderScreen({ navigation }: Props) {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        {/* Time picker */}
+
+        {/* Time Picker */}
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Ring the bell at</Text>
-          <LinearGradient
-            colors={[theme.accentSoft, theme.surface]}
-            style={styles.timeBox}
-          >
-            <View style={styles.timeRow}>
-              <Text style={styles.timeText}>7:00</Text>
-              <Text style={styles.amPmText}>AM</Text>
+          <LinearGradient colors={[theme.accentSoft, theme.surface]} style={styles.timeBox}>
+            <View style={styles.timePickerRow}>
+              <View style={styles.spinnerCol}>
+                <Pressable onPress={() => adjustHour(1)} style={styles.spinArrow}>
+                  <ChevronUp color={theme.accent} />
+                </Pressable>
+                <Text style={styles.timeDigit}>{displayHour}</Text>
+                <Pressable onPress={() => adjustHour(-1)} style={styles.spinArrow}>
+                  <ChevronDown color={theme.accent} />
+                </Pressable>
+              </View>
+              <Text style={styles.timeSep}>:</Text>
+              <View style={styles.spinnerCol}>
+                <Pressable onPress={() => adjustMinute(5)} style={styles.spinArrow}>
+                  <ChevronUp color={theme.accent} />
+                </Pressable>
+                <Text style={styles.timeDigit}>{displayMin}</Text>
+                <Pressable onPress={() => adjustMinute(-5)} style={styles.spinArrow}>
+                  <ChevronDown color={theme.accent} />
+                </Pressable>
+              </View>
+              <View style={styles.ampmCol}>
+                <Pressable onPress={() => setIsAM(true)} style={[styles.ampmBtn, isAM && styles.ampmBtnActive]}>
+                  <Text style={[styles.ampmText, isAM && styles.ampmTextActive]}>AM</Text>
+                </Pressable>
+                <Pressable onPress={() => setIsAM(false)} style={[styles.ampmBtn, !isAM && styles.ampmBtnActive]}>
+                  <Text style={[styles.ampmText, !isAM && styles.ampmTextActive]}>PM</Text>
+                </Pressable>
+              </View>
             </View>
-            <Text style={styles.timeHint}>brahma muhurta · brahma मुहूर्त</Text>
+            <Text style={styles.timeHint}>
+              {isBrahmaMuhurta ? 'brahma muhurta · ब्रह्म मुहूर्त' : `every ${activeDayNames}`}
+            </Text>
           </LinearGradient>
         </View>
 
@@ -52,10 +176,10 @@ export function ReminderScreen({ navigation }: Props) {
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Repeat</Text>
           <View style={styles.daysRow}>
-            {days.map((d, i) => {
-              const isActive = active[i] === 1;
+            {DAY_LABELS.map((d, i) => {
+              const isActive = activeDays[i];
               return (
-                <View key={i} style={{ flex: 1 }}>
+                <Pressable key={i} style={{ flex: 1 }} onPress={() => toggleDay(i)}>
                   {isActive ? (
                     <LinearGradient
                       colors={[theme.accentBright || '#ffe08a', theme.accentDeep || '#e8a838']}
@@ -68,58 +192,103 @@ export function ReminderScreen({ navigation }: Props) {
                       <Text style={[styles.dayText, styles.dayTextInactive]}>{d}</Text>
                     </View>
                   )}
-                </View>
+                </Pressable>
               );
             })}
+          </View>
+          <View style={styles.presetRow}>
+            <Pressable style={styles.presetChip} onPress={() => setActiveDays([true, true, true, true, true, false, false])}>
+              <Text style={styles.presetChipText}>Weekdays</Text>
+            </Pressable>
+            <Pressable style={styles.presetChip} onPress={() => setActiveDays([true, true, true, true, true, true, true])}>
+              <Text style={styles.presetChipText}>Every day</Text>
+            </Pressable>
+            <Pressable style={styles.presetChip} onPress={() => setActiveDays([false, false, false, false, false, true, true])}>
+              <Text style={styles.presetChipText}>Weekends</Text>
+            </Pressable>
           </View>
         </View>
 
         {/* Preferences */}
         <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Preferences</Text>
           <View style={styles.prefCard}>
-            <ReminderOpt label="Sound" value="Temple bell · मंदिर घंटा" chevron theme={theme} styles={styles} />
-            <ReminderOpt label="Gentle 3-min pre-bell" toggle on divider={false} theme={theme} styles={styles} />
+            <Pressable style={[styles.optRow, styles.optDivider]} onPress={() => setShowSoundModal(true)}>
+              <Text style={styles.optLabel}>Sound</Text>
+              <Text style={styles.optValue}>{currentSound.label} · {currentSound.labelHi}</Text>
+              <Svg width="7" height="12" viewBox="0 0 8 14">
+                <Path d="M1 1 L 7 7 L 1 13" stroke={theme.textMuted} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+              </Svg>
+            </Pressable>
+            <Pressable style={styles.optRow} onPress={() => setPreBell(v => !v)}>
+              <Text style={styles.optLabel}>Gentle 3-min pre-bell</Text>
+              <View style={[styles.toggleBg, preBell && styles.toggleBgOn]}>
+                <View style={[styles.toggleKnob, preBell && styles.toggleKnobOn]} />
+              </View>
+            </Pressable>
           </View>
         </View>
 
         {/* Preview */}
-        <View style={[styles.section, { flex: 1, paddingBottom: 40 }]}>
+        <View style={[styles.section, { paddingBottom: 40 }]}>
           <Text style={styles.sectionLabel}>Preview</Text>
-          <MiniNotif theme={theme} styles={styles} />
+          <MiniNotif theme={theme} styles={styles} time={`${displayHour}:${displayMin} ${isAM ? 'AM' : 'PM'}`} />
         </View>
+
       </ScrollView>
 
-      {/* CTA Bottom */}
-      <View style={styles.ctaContainer}>
-        <Pressable style={styles.ctaBtn}>
-          <Text style={styles.ctaBtnText}>Save Reminder</Text>
-          <Text style={styles.ctaBtnSub}>स्मरण सहेजें</Text>
+      {/* Save CTA */}
+      <View style={styles.saveCta}>
+        <Pressable
+          style={({ pressed }) => [styles.saveBtn, pressed && styles.saveBtnPressed]}
+          onPress={saveSettings}
+          disabled={saved}
+        >
+          <LinearGradient
+            colors={saved
+              ? [theme.accentDeep || '#b8760c', theme.accentDeep || '#b8760c']
+              : [theme.accentBright || '#ffe08a', theme.accentDeep || '#e8a838']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.saveBtnGradient}
+          >
+            <Animated.Text style={[styles.saveBtnText, { opacity: saved ? savedOpacity : 1 }]}>
+              {saved ? '✓  Saved' : 'Save Reminder'}
+            </Animated.Text>
+          </LinearGradient>
         </Pressable>
       </View>
+
+      {/* Sound modal */}
+      <SoundModal
+        visible={showSoundModal}
+        selectedId={soundId}
+        onSelect={(id: string) => { setSoundId(id); setShowSoundModal(false); }}
+        onClose={() => setShowSoundModal(false)}
+        theme={theme}
+        styles={styles}
+      />
     </LightShell>
   );
 }
 
-function ReminderOpt({ label, value, chevron, toggle, on, divider = true, theme, styles }: any) {
+function ChevronUp({ color }: { color: string }) {
   return (
-    <View style={[styles.optRow, divider && styles.optDivider]}>
-      <Text style={styles.optLabel}>{label}</Text>
-      {value && <Text style={styles.optValue}>{value}</Text>}
-      {toggle && (
-        <View style={[styles.toggleBg, on && styles.toggleBgOn]}>
-          <View style={[styles.toggleKnob, on && styles.toggleKnobOn]} />
-        </View>
-      )}
-      {chevron && (
-        <Svg width="7" height="12" viewBox="0 0 8 14">
-          <Path d="M1 1 L 7 7 L 1 13" stroke={theme.textMuted} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-        </Svg>
-      )}
-    </View>
+    <Svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+      <Path d="M1 8 L 8 2 L 15 8" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
   );
 }
 
-function MiniNotif({ theme, styles }: any) {
+function ChevronDown({ color }: { color: string }) {
+  return (
+    <Svg width="16" height="10" viewBox="0 0 16 10" fill="none">
+      <Path d="M1 2 L 8 8 L 15 2" stroke={color} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}
+
+function MiniNotif({ theme, styles, time }: any) {
   return (
     <View style={styles.notifCard}>
       <LinearGradient colors={[theme.accentBright || '#f4c257', theme.accentDeep || '#c67a1a']} style={styles.notifIconWrap}>
@@ -128,7 +297,7 @@ function MiniNotif({ theme, styles }: any) {
       <View style={styles.notifBody}>
         <View style={styles.notifHeaderRow}>
           <Text style={styles.notifTitle}>Deep</Text>
-          <Text style={styles.notifTime}>now</Text>
+          <Text style={styles.notifTime}>{time}</Text>
         </View>
         <Text style={styles.notifText}>
           Day 14 is ready — the lamp waits.{'\n'}
@@ -136,6 +305,40 @@ function MiniNotif({ theme, styles }: any) {
         </Text>
       </View>
     </View>
+  );
+}
+
+function SoundModal({ visible, selectedId, onSelect, onClose, theme, styles }: any) {
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <Pressable style={styles.modalOverlay} onPress={onClose}>
+        <Pressable style={styles.modalSheet}>
+          <View style={styles.modalHandle} />
+          <Text style={styles.modalTitle}>Notification Sound</Text>
+          <Text style={styles.modalTitleHi}>ध्वनि चुनें</Text>
+          <FlatList
+            data={SOUND_OPTIONS}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => {
+              const selected = item.id === selectedId;
+              return (
+                <Pressable style={[styles.soundRow, selected && styles.soundRowSelected]} onPress={() => onSelect(item.id)}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.soundLabel, selected && styles.soundLabelSelected]}>{item.label}</Text>
+                    <Text style={styles.soundLabelHi}>{item.labelHi}</Text>
+                  </View>
+                  {selected && (
+                    <Svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                      <Path d="M5 12 L 10 17 L 19 7" stroke={theme.accent} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                    </Svg>
+                  )}
+                </Pressable>
+              );
+            }}
+          />
+        </Pressable>
+      </Pressable>
+    </Modal>
   );
 }
 
@@ -167,9 +370,7 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     fontSize: 20,
     color: theme.text,
   },
-  scrollContent: {
-    paddingTop: 8,
-  },
+  scrollContent: { paddingTop: 8 },
   section: {
     paddingHorizontal: 24,
     marginTop: 24,
@@ -183,36 +384,71 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     marginBottom: 12,
   },
   timeBox: {
-    padding: 24,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
     borderRadius: 24,
     borderWidth: 1,
     borderColor: theme.accentBorder,
     alignItems: 'center',
   },
-  timeRow: {
+  timePickerRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'center',
-    gap: 4,
+    alignItems: 'center',
+    gap: 8,
   },
-  timeText: {
+  spinnerCol: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  spinArrow: {
+    padding: 8,
+    borderRadius: 10,
+    backgroundColor: theme.surfaceSoft,
+  },
+  timeDigit: {
     fontFamily: theme.fonts.serif,
-    fontSize: 80,
-    lineHeight: 88,
+    fontSize: 56,
+    lineHeight: 64,
     color: theme.text,
-    letterSpacing: -3,
+    letterSpacing: -2,
+    minWidth: 72,
+    textAlign: 'center',
   },
-  amPmText: {
-    fontFamily: theme.fonts.medium,
-    fontSize: 22,
+  timeSep: {
+    fontFamily: theme.fonts.serif,
+    fontSize: 48,
     color: theme.accent,
-    marginLeft: 6,
+    marginBottom: 4,
+    marginHorizontal: 2,
   },
+  ampmCol: {
+    marginLeft: 8,
+    gap: 8,
+  },
+  ampmBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    backgroundColor: theme.surfaceSoft,
+    borderWidth: 1,
+    borderColor: theme.cardBorder,
+  },
+  ampmBtnActive: {
+    backgroundColor: theme.accentSoft,
+    borderColor: theme.accentBorder,
+  },
+  ampmText: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 14,
+    color: theme.textMuted,
+  },
+  ampmTextActive: { color: theme.accent },
   timeHint: {
-    marginTop: 12,
+    marginTop: 16,
     fontFamily: theme.fonts.body,
     fontSize: 13,
     color: theme.textMuted,
+    textAlign: 'center',
   },
   daysRow: {
     flexDirection: 'row',
@@ -239,10 +475,24 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     fontFamily: theme.fonts.heading,
     fontSize: 15,
   },
-  dayTextActive: {
-    color: theme.surface,
+  dayTextActive: { color: theme.surface },
+  dayTextInactive: { color: theme.textMuted },
+  presetRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 14,
   },
-  dayTextInactive: {
+  presetChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: theme.surfaceSoft,
+    borderWidth: 1,
+    borderColor: theme.cardBorder,
+  },
+  presetChipText: {
+    fontFamily: theme.fonts.medium,
+    fontSize: 12,
     color: theme.textMuted,
   },
   prefCard: {
@@ -282,9 +532,7 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     padding: 2,
     justifyContent: 'center',
   },
-  toggleBgOn: {
-    backgroundColor: theme.accent,
-  },
+  toggleBgOn: { backgroundColor: theme.accent },
   toggleKnob: {
     width: 20,
     height: 20,
@@ -295,9 +543,7 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  toggleKnobOn: {
-    transform: [{ translateX: 18 }],
-  },
+  toggleKnobOn: { transform: [{ translateX: 18 }] },
   notifCard: {
     backgroundColor: theme.surfaceSoft,
     borderWidth: 1,
@@ -315,9 +561,7 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  notifBody: {
-    flex: 1,
-  },
+  notifBody: { flex: 1 },
   notifHeaderRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -344,27 +588,91 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     color: theme.accent,
     fontStyle: 'italic',
   },
-  ctaContainer: {
-    paddingHorizontal: 24,
-    paddingTop: 10,
-    paddingBottom: 24,
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    justifyContent: 'flex-end',
   },
-  ctaBtn: {
-    backgroundColor: theme.text,
-    borderRadius: 16,
+  modalSheet: {
+    backgroundColor: theme.surface,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingTop: 12,
+    paddingBottom: 36,
+    paddingHorizontal: 24,
+    borderTopWidth: 1,
+    borderColor: theme.cardBorder,
+  },
+  modalHandle: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: theme.cardBorder,
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 18,
+    color: theme.text,
+    marginBottom: 2,
+  },
+  modalTitleHi: {
+    fontFamily: theme.fonts.hindiMedium,
+    fontSize: 13,
+    color: theme.textMuted,
+    marginBottom: 18,
+  },
+  soundRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.cardBorder,
+  },
+  soundRowSelected: {},
+  soundLabel: {
+    fontFamily: theme.fonts.medium,
+    fontSize: 15,
+    color: theme.text,
+  },
+  soundLabelSelected: { color: theme.accent },
+  soundLabelHi: {
+    fontFamily: theme.fonts.hindi,
+    fontSize: 13,
+    color: theme.textMuted,
+    marginTop: 2,
+  },
+  saveCta: {
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    paddingBottom: 28,
+    borderTopWidth: 1,
+    borderTopColor: theme.cardBorder,
+    backgroundColor: theme.background,
+  },
+  saveBtn: {
+    borderRadius: 18,
+    overflow: 'hidden',
+    elevation: 6,
+    shadowColor: theme.accent,
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  saveBtnPressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
+  },
+  saveBtnGradient: {
+    paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ctaBtnText: {
+  saveBtnText: {
     fontFamily: theme.fonts.heading,
-    fontSize: 15,
-    color: theme.background,
-  },
-  ctaBtnSub: {
-    fontFamily: theme.fonts.hindiMedium,
-    fontSize: 12,
-    color: theme.background,
-    opacity: 0.7,
+    fontSize: 16,
+    color: theme.surface,
+    letterSpacing: 0.5,
   },
 });

@@ -14,6 +14,7 @@ type LightShellProps = {
   glow?: boolean;
   search?: boolean;
   onSearchPress?: () => void;
+  rightSlot?: ReactNode;
 };
 
 export function LightShell({
@@ -23,6 +24,7 @@ export function LightShell({
   glow = true,
   search = false,
   onSearchPress,
+  rightSlot,
 }: LightShellProps) {
   const { theme: t, resolvedMode } = useTheme();
   const isLight = resolvedMode === 'light';
@@ -31,23 +33,26 @@ export function LightShell({
     <View style={[styles.root, { backgroundColor: t.background }]}>
       <StatusBar style={isLight ? 'dark' : 'light'} />
       <MandalaBG
-        opacity={isLight ? 0.055 : 0.08}
+        opacity={isLight ? 0.03 : 0.055}
         from={t.gradientStart}
         via={t.gradientMid}
         to={t.gradientEnd}
         stroke={t.mandalaStroke}
         glowColor={t.accentSoft}
+        showBottomGlow={glow}
       />
-      {glow ? <View style={[styles.glow, { backgroundColor: t.accentSoft }]} /> : null}
       <SafeAreaView style={styles.content}>
-        {title ? (
+        {(title || rightSlot) ? (
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
               {hindiTitle ? (
                 <Text style={[styles.hindiTitle, { color: t.text }]}>{hindiTitle}</Text>
               ) : null}
-              <Text style={[styles.title, { color: t.textMuted }]}>{title}</Text>
+              {title ? (
+                <Text style={[styles.title, { color: t.textMuted }]}>{title}</Text>
+              ) : null}
             </View>
+            {rightSlot ? rightSlot : null}
             {search ? (
               <Pressable
                 onPress={onSearchPress}
@@ -79,14 +84,6 @@ const styles = StyleSheet.create({
   root: {
     flex: 1,
   },
-  glow: {
-    position: 'absolute',
-    top: '35%',
-    alignSelf: 'center',
-    width: 460,
-    height: 460,
-    borderRadius: 230,
-  },
   content: {
     flex: 1,
     zIndex: 2,
@@ -96,7 +93,7 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'center',
   },
   hindiTitle: {
     fontFamily: 'NotoSansDevanagari_500Medium',

@@ -25,8 +25,8 @@ export function DarkShell({ children, title, hindiTitle, glow = true }: DarkShel
         to={t.gradientEnd}
         stroke={t.mandalaStroke}
         glowColor={t.accentSoft}
+        showBottomGlow={glow}
       />
-      {glow ? <View style={[styles.glow, { backgroundColor: t.accentSoft }]} /> : null}
       <SafeAreaView style={styles.content}>
         {title ? (
           <View style={styles.header}>
@@ -47,14 +47,6 @@ export function DarkShell({ children, title, hindiTitle, glow = true }: DarkShel
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-  },
-  glow: {
-    position: 'absolute',
-    top: '35%',
-    alignSelf: 'center',
-    width: 460,
-    height: 460,
-    borderRadius: 230,
   },
   content: {
     flex: 1,

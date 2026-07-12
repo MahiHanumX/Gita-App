@@ -6,17 +6,19 @@ import { JourneyScreen } from '../screens/profile/JourneyScreen';
 import { SettingsScreen } from '../screens/profile/SettingsScreen';
 import { ReminderScreen } from '../screens/profile/ReminderScreen';
 import { PathOverviewScreen } from '../screens/profile/PathOverviewScreen';
-import { darkTheme } from '../theme/themes';
+import { useTheme } from '../theme';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
 export function ProfileNavigator() {
+  const { theme } = useTheme();
+
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
         animation: 'slide_from_right',
-        contentStyle: { backgroundColor: darkTheme.background },
+        contentStyle: { backgroundColor: theme.background },
       }}
     >
       <Stack.Screen name="ProfileHome" component={ProfileScreen} />

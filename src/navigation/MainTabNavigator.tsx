@@ -1,4 +1,5 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { PathScreen } from '../screens/path/PathScreen';
 import { LibraryNavigator } from './LibraryNavigator';
@@ -6,13 +7,12 @@ import { PracticeHomeScreen } from '../screens/practice/PracticeHomeScreen';
 import { ProfileNavigator } from './ProfileNavigator';
 import { DiyaIcon } from '../components/Icons';
 import { MainTabParamList } from './types';
-import { darkTheme, lightLotusTheme } from '../theme/themes';
+import { useTheme, AppTheme } from '../theme';
 import { useTranslation } from '../i18n';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
-function TabIcon({ name, active, light }: { name: string; active: boolean; light?: boolean }) {
-  const theme = light ? lightLotusTheme : darkTheme;
+function TabIcon({ name, active, theme }: { name: string; active: boolean; theme: AppTheme }) {
   const c = active ? theme.tabActive : theme.tabInactive;
   const s = 22;
   if (name === 'Path') {
@@ -44,51 +44,48 @@ function TabIcon({ name, active, light }: { name: string; active: boolean; light
   );
 }
 
-const darkTabBar = {
-  backgroundColor: darkTheme.tabBarBg,
-  borderTopColor: darkTheme.tabBarBorder,
-  paddingTop: 8,
-  height: 72,
-};
-
-const lightTabBar = {
-  backgroundColor: lightLotusTheme.tabBarBg,
-  borderTopColor: lightLotusTheme.tabBarBorder,
-  paddingTop: 8,
-  height: 72,
-};
-
 export function MainTabNavigator() {
   const t = useTranslation();
+  const { theme, resolvedMode } = useTheme();
+
+  const tabBarStyle = {
+    backgroundColor: theme.tabBarBg,
+    borderTopColor: theme.tabBarBorder,
+    paddingTop: 8,
+    height: 72,
+  };
 
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarStyle: route.name === 'Library' ? lightTabBar : darkTabBar,
-        tabBarActiveTintColor: route.name === 'Library' ? lightLotusTheme.tabActive : darkTheme.tabActive,
-        tabBarInactiveTintColor: route.name === 'Library' ? lightLotusTheme.tabInactive : darkTheme.tabInactive,
-        tabBarLabelStyle: {
-          fontFamily: 'Poppins_500Medium',
-          fontSize: 10,
-          letterSpacing: 0.4,
-        },
-        tabBarIcon: ({ focused }) => (
-          <TabIcon name={route.name} active={focused} light={route.name === 'Library'} />
-        ),
-      })}
+      key={resolvedMode}
+      screenOptions={({ route }) => {
+        const routeName = getFocusedRouteNameFromRoute(route);
+        
+        // Hide bottom tab bar on child screens of Profile stack
+        const isProfileChild = route.name === 'Profile' && routeName && routeName !== 'ProfileHome';
+        // Hide bottom tab bar on child screens of Library stack (e.g. ChapterDetail, Search, VerseDetail)
+        const isLibraryChild = route.name === 'Library' && routeName && routeName !== 'LibraryHome';
+
+        const shouldHideTabBar = isProfileChild || isLibraryChild;
+
+        return {
+          headerShown: false,
+          tabBarStyle: shouldHideTabBar ? { display: 'none' } : tabBarStyle,
+          tabBarActiveTintColor: theme.tabActive,
+          tabBarInactiveTintColor: theme.tabInactive,
+          tabBarLabelStyle: {
+            fontFamily: 'Poppins_500Medium',
+            fontSize: 10,
+            letterSpacing: 0.4,
+          },
+          tabBarIcon: ({ focused }) => (
+            <TabIcon name={route.name} active={focused} theme={theme} />
+          ),
+        };
+      }}
     >
       <Tab.Screen name="Path" component={PathScreen} options={{ tabBarLabel: t.tabs.path }} />
-      <Tab.Screen
-        name="Library"
-        component={LibraryNavigator}
-        options={{
-          tabBarLabel: t.tabs.library,
-          tabBarStyle: lightTabBar,
-          tabBarActiveTintColor: lightLotusTheme.tabActive,
-          tabBarInactiveTintColor: lightLotusTheme.tabInactive,
-        }}
-      />
+      <Tab.Screen name="Library" component={LibraryNavigator} options={{ tabBarLabel: t.tabs.library }} />
       <Tab.Screen name="Practice" component={PracticeHomeScreen} options={{ tabBarLabel: t.tabs.practice }} />
       <Tab.Screen name="Profile" component={ProfileNavigator} options={{ tabBarLabel: t.tabs.profile }} />
     </Tab.Navigator>

@@ -1,24 +1,26 @@
 import { StyleSheet, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, G, Line, Pattern, Rect } from 'react-native-svg';
-import { PALETTE } from '../theme/palette';
+
 
 type MandalaBGProps = {
   opacity?: number;
-  from?: string;
-  via?: string;
-  to?: string;
-  stroke?: string;
-  glowColor?: string;
+  from: string;
+  via: string;
+  to: string;
+  stroke: string;
+  glowColor: string;
+  showBottomGlow?: boolean;
 };
 
 export function MandalaBG({
   opacity = 0.06,
-  from = PALETTE.indigo,
-  via = '#2d2b5f',
-  to = '#3a2358',
-  stroke = PALETTE.saffronBright,
-  glowColor = 'rgba(232,168,56,0.22)',
+  from,
+  via,
+  to,
+  stroke,
+  glowColor,
+  showBottomGlow = true,
 }: MandalaBGProps) {
   const petals = Array.from({ length: 12 }, (_, i) => {
     const a = (i * 30 * Math.PI) / 180;
@@ -39,6 +41,7 @@ export function MandalaBG({
     <View style={StyleSheet.absoluteFill}>
       <LinearGradient colors={[from, via, to]} locations={[0, 0.55, 1]} style={StyleSheet.absoluteFill} />
       <View style={[styles.glow, { backgroundColor: glowColor }]} />
+      {showBottomGlow && <View style={[styles.bottomGlow, { backgroundColor: glowColor }]} />}
       <Svg width="100%" height="100%" style={[StyleSheet.absoluteFill, { opacity }]}>
         <Defs>
           <Pattern id="mandala" patternUnits="userSpaceOnUse" width={180} height={180}>
@@ -71,5 +74,13 @@ const styles = StyleSheet.create({
     height: 480,
     borderRadius: 240,
     opacity: 0.5,
+  },
+  bottomGlow: {
+    position: 'absolute',
+    bottom: -160,
+    alignSelf: 'center',
+    width: 520,
+    height: 380,
+    borderRadius: 260,
   },
 });

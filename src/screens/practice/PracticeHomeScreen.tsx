@@ -1,15 +1,16 @@
+import { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Path } from 'react-native-svg';
-import { MandalaBG } from '../../components/MandalaBG';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { LightShell } from '../../components/LightShell';
 import { usePracticeHub } from '../../api_data/hooks';
 import { useTranslation } from '../../i18n';
-import { PALETTE } from '../../theme/palette';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CompositeScreenProps } from '@react-navigation/native';
 import { MainTabParamList, RootStackParamList } from '../../navigation/types';
+import { useTheme } from '../../theme';
+import { AppTheme } from '../../theme/themes';
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<MainTabParamList, 'Practice'>,
@@ -19,95 +20,81 @@ type Props = CompositeScreenProps<
 export function PracticeHomeScreen({ navigation }: Props) {
   const { data } = usePracticeHub();
   const t = useTranslation();
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme), [theme]);
+
   if (!data) return null;
 
   const { headerHi, headerEn, suggestion, tiles } = data;
 
   return (
-    <View style={styles.root}>
-      <MandalaBG opacity={0.05} from={PALETTE.indigoDeep} via={PALETTE.indigo} to="#2d2b5f" />
-      <SafeAreaView style={styles.content}>
-        <View style={styles.header}>
-          <Text style={styles.headerHi}>{headerHi}</Text>
-          <Text style={styles.headerEn}>{headerEn}</Text>
-        </View>
-
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <Pressable
-            style={({ pressed }) => [styles.suggestion, pressed && { opacity: 0.95 }]}
-            onPress={() => navigation.navigate('MeditationSession', {
-              sessionId: 'breathwork-warrior',
-              titleEn: 'Breath of the Warrior',
-              titleHi: 'वीर श्वास',
-            })}
+    <LightShell hindiTitle={headerHi} title={headerEn} glow>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        {/* Suggested session */}
+        <Pressable
+          style={({ pressed }) => [styles.suggestion, pressed && { opacity: 0.95 }]}
+          onPress={() => navigation.navigate('MeditationSession', {
+            sessionId: 'breathwork-warrior',
+            titleEn: 'Breath of the Warrior',
+            titleHi: 'वीर श्वास',
+          })}
+        >
+          <LinearGradient
+            colors={[theme.accentSoft, `${theme.accentSoft}55`]}
+            style={styles.suggestionInner}
           >
-            <LinearGradient colors={['rgba(232,168,56,0.22)', 'rgba(232,168,56,0.08)']} style={styles.suggestionInner}>
-              <View style={styles.playIcon}>
-                <Svg width={26} height={26} viewBox="0 0 24 24" fill="none">
-                  <Circle cx={12} cy={12} r={9} stroke={PALETTE.indigoDeep} strokeWidth={1.5} opacity={0.4} />
-                  <Path d="M9 8 v 8 l 7 -4 z" fill={PALETTE.indigoDeep} />
-                </Svg>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.suggestedLabel}>{suggestion.label}</Text>
-                <Text style={styles.suggestedTitle}>{suggestion.title}</Text>
-                <Text style={styles.suggestedHi}>{suggestion.hindiSubtitle}</Text>
-              </View>
-            </LinearGradient>
-          </Pressable>
+            <View style={styles.playIcon}>
+              <Svg width={26} height={26} viewBox="0 0 24 24" fill="none">
+                <Circle cx={12} cy={12} r={9} stroke={theme.accent} strokeWidth={1.5} opacity={0.5} />
+                <Path d="M9 8 v 8 l 7 -4 z" fill={theme.accent} />
+              </Svg>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.suggestedLabel}>{suggestion.label}</Text>
+              <Text style={styles.suggestedTitle}>{suggestion.title}</Text>
+              <Text style={styles.suggestedHi}>{suggestion.hindiSubtitle}</Text>
+            </View>
+          </LinearGradient>
+        </Pressable>
 
-          <Text style={styles.sectionLabel}>{t.common.explore}</Text>
-          <View style={styles.grid}>
-            {tiles.map((tile) => (
-              <Pressable
-                key={tile.id}
-                style={({ pressed }) => [styles.tilePressable, pressed && { opacity: 0.85 }]}
-                onPress={() => {
-                  if (tile.id === 'mantra') {
-                    navigation.navigate('MantraJaap');
-                  } else {
-                    navigation.navigate('MeditationSession', {
-                      sessionId: tile.id,
-                      titleEn: tile.en === 'Meditation' ? 'Stillness of the River' : tile.en,
-                      titleHi: tile.en === 'Meditation' ? 'नदी की शांति' : tile.hi,
-                    });
-                  }
-                }}
-              >
-                <LinearGradient colors={tile.gradient} style={styles.tile}>
-                  <Text style={styles.tileHi}>{tile.hi}</Text>
-                  <Text style={styles.tileEn}>{tile.en}</Text>
-                  <Text style={styles.tileCount}>{tile.count}</Text>
-                </LinearGradient>
-              </Pressable>
-            ))}
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </View>
+        {/* Explore grid */}
+        <Text style={styles.sectionLabel}>{t.common.explore}</Text>
+        <View style={styles.grid}>
+          {tiles.map((tile) => (
+            <Pressable
+              key={tile.id}
+              style={({ pressed }) => [styles.tilePressable, pressed && { opacity: 0.85 }]}
+              onPress={() => {
+                if (tile.id === 'mantra') {
+                  navigation.navigate('MantraJaap');
+                } else {
+                  navigation.navigate('MeditationSession', {
+                    sessionId: tile.id,
+                    titleEn: tile.en === 'Meditation' ? 'Stillness of the River' : tile.en,
+                    titleHi: tile.en === 'Meditation' ? 'नदी की शांति' : tile.hi,
+                  });
+                }
+              }}
+            >
+              <LinearGradient colors={tile.gradient} style={styles.tile}>
+                <Text style={styles.tileHi}>{tile.hi}</Text>
+                <Text style={styles.tileEn}>{tile.en}</Text>
+                <Text style={styles.tileCount}>{tile.count}</Text>
+              </LinearGradient>
+            </Pressable>
+          ))}
+        </View>
+      </ScrollView>
+    </LightShell>
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: PALETTE.indigoDeep },
-  content: { flex: 1, zIndex: 2 },
-  header: { paddingHorizontal: 24, paddingBottom: 12 },
-  headerHi: {
-    fontFamily: 'NotoSansDevanagari_500Medium',
-    fontSize: 26,
-    color: PALETTE.cream,
-  },
-  headerEn: {
-    fontFamily: 'Poppins_500Medium',
-    fontSize: 14,
-    color: PALETTE.textOnDarkMuted,
-    marginTop: 2,
-  },
+const getStyles = (theme: AppTheme) => StyleSheet.create({
   scroll: { paddingBottom: 24 },
   suggestion: { paddingHorizontal: 24, paddingBottom: 18 },
   suggestionInner: {
     borderWidth: 1,
-    borderColor: 'rgba(232,168,56,0.3)',
+    borderColor: theme.accentBorder,
     borderRadius: 20,
     padding: 18,
     flexDirection: 'row',
@@ -118,35 +105,37 @@ const styles = StyleSheet.create({
     width: 54,
     height: 54,
     borderRadius: 16,
-    backgroundColor: '#ffe08a',
+    backgroundColor: theme.accentSoft,
+    borderWidth: 1,
+    borderColor: theme.accentBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
   suggestedLabel: {
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: theme.fonts.heading,
     fontSize: 11,
-    color: PALETTE.saffronBright,
+    color: theme.accent,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
   suggestedTitle: {
     marginTop: 3,
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: theme.fonts.heading,
     fontSize: 16,
-    color: PALETTE.cream,
+    color: theme.text,
   },
   suggestedHi: {
-    fontFamily: 'NotoSansDevanagari_400Regular',
+    fontFamily: theme.fonts.hindi,
     fontSize: 13,
-    color: PALETTE.textOnDarkMuted,
+    color: theme.textMuted,
     marginTop: 2,
   },
   sectionLabel: {
     paddingHorizontal: 24,
     marginBottom: 12,
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: theme.fonts.heading,
     fontSize: 11,
-    color: PALETTE.textOnDarkMuted,
+    color: theme.textMuted,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
@@ -166,20 +155,20 @@ const styles = StyleSheet.create({
     minHeight: 120,
   },
   tileHi: {
-    fontFamily: 'NotoSansDevanagari_500Medium',
+    fontFamily: theme.fonts.hindiMedium,
     fontSize: 18,
-    color: PALETTE.cream,
+    color: theme.text,
   },
   tileEn: {
     marginTop: 4,
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: theme.fonts.heading,
     fontSize: 14,
-    color: PALETTE.cream,
+    color: theme.text,
   },
   tileCount: {
     marginTop: 10,
-    fontFamily: 'Poppins_400Regular',
+    fontFamily: theme.fonts.body,
     fontSize: 11,
-    color: 'rgba(245,236,216,0.65)',
+    color: theme.textMuted,
   },
 });

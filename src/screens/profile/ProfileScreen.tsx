@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LightShell } from '../../components/LightShell';
@@ -17,26 +16,65 @@ type Props = NativeStackScreenProps<ProfileStackParamList, 'ProfileHome'>;
 export function ProfileScreen({ navigation }: Props) {
   const { data: profile } = useUserProfile();
   const t = useTranslation();
-  const { theme, resolvedMode } = useTheme();
+  const { theme, resolvedMode, toggleMode } = useTheme();
   const styles = useMemo(() => getStyles(theme), [theme]);
 
   if (!profile) return null;
 
   return (
-    <LightShell glow={false}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.topRow}>
-            <Text style={styles.screenTitle}>{t.profile.you}</Text>
-            <Pressable
-              onPress={() => navigation.navigate('Settings')}
-              style={({ pressed }) => [styles.settingsBtn, pressed && { opacity: 0.7 }]}
-            >
+    <LightShell
+      glow={false}
+      title={t.profile.you}
+      rightSlot={
+        <View style={styles.topActions}>
+          {/* Theme toggle: sun in dark mode, moon in light mode */}
+          <Pressable
+            onPress={toggleMode}
+            style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.7 }]}
+            accessibilityLabel="Toggle theme"
+          >
+            {resolvedMode === 'dark' ? (
               <Svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <Circle cx="12" cy="12" r="3" stroke={theme.text} strokeWidth="1.8" />
-                <Path d="M12 3 v 3 M 12 18 v 3 M 3 12 h 3 M 18 12 h 3 M 5 5 l 2 2 M 17 17 l 2 2 M 5 19 l 2 -2 M 17 7 l 2 -2" stroke={theme.text} strokeWidth="1.8" strokeLinecap="round" />
+                <Circle cx="12" cy="12" r="4" stroke={theme.text} strokeWidth="1.8" />
+                <Path
+                  d="M12 2 v 2 M 12 20 v 2 M 2 12 h 2 M 20 12 h 2 M 4.93 4.93 l 1.41 1.41 M 17.66 17.66 l 1.41 1.41 M 4.93 19.07 l 1.41 -1.41 M 17.66 6.34 l 1.41 -1.41"
+                  stroke={theme.text}
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
               </Svg>
-            </Pressable>
-          </View>
+            ) : (
+              <Svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <Path
+                  d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+                  stroke={theme.text}
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </Svg>
+            )}
+          </Pressable>
+
+          {/* Settings sliders */}
+          <Pressable
+            onPress={() => navigation.navigate('Settings')}
+            style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.7 }]}
+            accessibilityLabel="Open settings"
+          >
+            <Svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <Path d="M3 6 h18" stroke={theme.text} strokeWidth="1.8" strokeLinecap="round" />
+              <Circle cx="8" cy="6" r="2.2" fill={theme.background} stroke={theme.text} strokeWidth="1.8" />
+              <Path d="M3 12 h18" stroke={theme.text} strokeWidth="1.8" strokeLinecap="round" />
+              <Circle cx="16" cy="12" r="2.2" fill={theme.background} stroke={theme.text} strokeWidth="1.8" />
+              <Path d="M3 18 h18" stroke={theme.text} strokeWidth="1.8" strokeLinecap="round" />
+              <Circle cx="11" cy="18" r="2.2" fill={theme.background} stroke={theme.text} strokeWidth="1.8" />
+            </Svg>
+          </Pressable>
+        </View>
+      }
+    >
+      <ScrollView showsVerticalScrollIndicator={false}>
 
           <View style={styles.profileRow}>
             <LinearGradient colors={[theme.accentBright, theme.accentDeep]} style={styles.avatar}>
@@ -97,7 +135,9 @@ export function ProfileScreen({ navigation }: Props) {
             </View>
           </View>
 
-          <LanguagePicker />
+          <View style={{ paddingBottom: 32 }}>
+            <LanguagePicker />
+          </View>
         </ScrollView>
     </LightShell>
   );
@@ -145,19 +185,16 @@ function BadgeChip({ day, label, hindi, earned, mini, icon }: any) {
 }
 
 const getStyles = (theme: AppTheme) => StyleSheet.create({
-  root: { flex: 1, backgroundColor: theme.background },
-  content: { flex: 1, zIndex: 2 },
-  topRow: { paddingHorizontal: 24, paddingBottom: 8, flexDirection: 'row', justifyContent: 'space-between' },
-  screenTitle: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 20,
-    color: theme.text,
+  topActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-  settingsBtn: {
+  actionBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: theme.surfaceSoft,
+    backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },

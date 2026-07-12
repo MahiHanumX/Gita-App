@@ -53,7 +53,6 @@ export function PathScreen() {
         stroke={theme.mandalaStroke}
         glowColor={theme.accentSoft}
       />
-      <View style={[styles.bottomGlow, { backgroundColor: theme.accentSoft }]} />
       <SafeAreaView
         edges={['top']}
         style={[
@@ -149,7 +148,7 @@ function MilestoneMarker({
   theme: any;
   resolvedMode: string;
 }) {
-  const activeColor = resolvedMode === 'light' ? theme.accentDeep : PALETTE.saffronBright;
+  const activeColor = resolvedMode === 'light' ? theme.accentDeep : theme.accentBright;
 
   return (
     <View style={[styles.milestone, { top, left }]}>
@@ -222,14 +221,6 @@ function DaySheet({
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  bottomGlow: {
-    position: 'absolute',
-    bottom: -160,
-    alignSelf: 'center',
-    width: 520,
-    height: 380,
-    borderRadius: 260,
-  },
   header: {
     position: 'absolute',
     top: 0,

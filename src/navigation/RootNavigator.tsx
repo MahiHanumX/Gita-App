@@ -1,4 +1,4 @@
-import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { OnboardingNavigator } from './OnboardingNavigator';
 import { MainTabNavigator } from './MainTabNavigator';
@@ -6,25 +6,31 @@ import { ChapterFlowNavigator } from './ChapterFlowNavigator';
 import { MantraJaapScreen } from '../screens/practice/MantraJaapScreen';
 import { MeditationSessionScreen } from '../screens/practice/MeditationSessionScreen';
 import { RootStackParamList } from './types';
-import { PALETTE } from '../theme/palette';
+import { useTheme } from '../theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const theme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    background: PALETTE.indigoDeep,
-    card: PALETTE.indigoDeep,
-    primary: PALETTE.saffronBright,
-    text: PALETTE.cream,
-    border: 'rgba(245,236,216,0.08)',
-  },
-};
-
 export function RootNavigator() {
+  const { theme, resolvedMode } = useTheme();
+
+  const baseTheme = resolvedMode === 'dark' ? DarkTheme : DefaultTheme;
+
+  const navTheme = {
+    ...baseTheme,
+    dark: resolvedMode === 'dark',
+    colors: {
+      ...baseTheme.colors,
+      primary: theme.accent,
+      background: theme.background,
+      card: theme.tabBarBg,
+      text: theme.text,
+      border: theme.tabBarBorder,
+      notification: theme.accentDeep,
+    },
+  };
+
   return (
-    <NavigationContainer theme={theme}>
+    <NavigationContainer theme={navTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Onboarding" component={OnboardingNavigator} />
         <Stack.Screen name="Main" component={MainTabNavigator} />

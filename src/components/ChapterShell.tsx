@@ -30,7 +30,7 @@ export function ChapterShell({
     <View style={[styles.root, { backgroundColor: theme.background }]}>
       <StatusBar style={theme.statusBar} />
       <MandalaBG
-        opacity={0.055}
+        opacity={theme.mode === 'light' ? 0.03 : 0.055}
         from={theme.gradientStart}
         via={theme.gradientMid}
         to={theme.gradientEnd}

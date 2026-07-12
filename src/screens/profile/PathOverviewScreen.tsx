@@ -7,13 +7,15 @@ import { AppTheme } from '../../theme/themes';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { DiyaIcon } from '../../components/DiyaIcon';
+import { MandalaBG } from '../../components/MandalaBG';
 
 type Props = NativeStackScreenProps<ProfileStackParamList, 'PathOverview'>;
 
 const SCREEN_W = Dimensions.get('window').width;
 
 export function PathOverviewScreen({ navigation }: Props) {
-  const { theme } = useTheme();
+  const { theme, resolvedMode } = useTheme();
+  const isLight = resolvedMode === 'light';
   const styles = useMemo(() => getStyles(theme), [theme]);
 
   const cols = 5;
@@ -52,8 +54,14 @@ export function PathOverviewScreen({ navigation }: Props) {
 
   return (
     <View style={styles.root}>
-      {/* Radial Gradient Mock */}
-      <View style={styles.radialGlow} />
+      <MandalaBG
+        opacity={isLight ? 0.03 : 0.055}
+        from={theme.gradientStart}
+        via={theme.gradientMid}
+        to={theme.gradientEnd}
+        stroke={theme.mandalaStroke}
+        glowColor={theme.accentSoft}
+      />
 
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()} style={styles.iconBtn}>

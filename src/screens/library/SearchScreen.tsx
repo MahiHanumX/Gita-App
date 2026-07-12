@@ -16,6 +16,7 @@ import { PALETTE } from '../../theme/palette';
 import { LibraryStackParamList } from '../../navigation/types';
 import { useLocale, useTranslation } from '../../i18n';
 import { useTheme } from '../../theme';
+import { MandalaBG } from '../../components/MandalaBG';
 
 type Props = NativeStackScreenProps<LibraryStackParamList, 'Search'>;
 
@@ -51,6 +52,14 @@ export function SearchScreen({ navigation }: Props) {
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
+      <MandalaBG
+        opacity={isLight ? 0.03 : 0.055}
+        from={theme.gradientStart}
+        via={theme.gradientMid}
+        to={theme.gradientEnd}
+        stroke={theme.mandalaStroke}
+        glowColor={theme.accentSoft}
+      />
       <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
         {/* Search Bar Input Row */}
         <View style={styles.searchRow}>
@@ -146,15 +155,57 @@ export function SearchScreen({ navigation }: Props) {
             ) : (
               <View style={styles.suggestionsList}>
                 {filteredSuggestions.map((item, index) => (
-                  <View
+                  <Pressable
                     key={index}
-                    style={[
+                    onPress={() => {
+                      let chapterId = 2;
+                      let verseNum = 47;
+                      let hi = 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥';
+                      let en = 'You have the right to perform your actions, but never to their fruits. Let not the fruits of action be your motive, nor let your attachment be to inaction.';
+                      let isKeyVerse = true;
+
+                      if (item.hi.includes('भक्ति')) {
+                        chapterId = 2;
+                        verseNum = 48;
+                        hi = 'योगस्थः कुरु कर्माणि सङ्गं त्यक्त्वा धनञ्जय।\nसिद्ध्यसिद्ध्योः समो भूत्वा समत्वं योग उच्यते॥';
+                        en = 'Perform your duty equipoised, O Arjuna, abandoning all attachment to success or failure. Such equanimity is called Yoga.';
+                        isKeyVerse = false;
+                      } else if (item.hi.includes('आत्मा')) {
+                        chapterId = 2;
+                        verseNum = 51;
+                        hi = 'कर्मजं बुद्धियुक्ता हि फलं त्यक्त्वा मनीषिणः।\nजन्मबन्धविनिर्मुक्ताः पदं गच्छन्त्यनामयम्॥';
+                        en = 'The wise, possessed of unified intellect, abandon the fruits born of action. Freed from the bonds of rebirth, they attain the state beyond all sorrow.';
+                        isKeyVerse = false;
+                      } else if (item.hi.includes('ध्यान')) {
+                        chapterId = 2;
+                        verseNum = 50;
+                        hi = 'बुद्धियुक्तो जहातीह उभे सुकृतदुष्कृते।\nतस्माद्योगाय युज्यस्व योगः कर्मसु कौशलम्॥';
+                        en = 'Endowed with wisdom, one discards both good and evil actions in this life. Therefore, strive for Yoga—Yoga is skill in action.';
+                        isKeyVerse = false;
+                      } else if (item.hi.includes('ज्ञान')) {
+                        chapterId = 2;
+                        verseNum = 49;
+                        hi = 'दूरेण ह्यवरं कर्म बुद्धियोगाद्धनञ्जय।\nबुद्धौ शरणमन्विच्छ कृपणाः फलहेतవः॥';
+                        en = 'Seek refuge in divine intellect, Arjuna. Action performed with desire for fruits is far inferior to selfless action.';
+                        isKeyVerse = false;
+                      }
+
+                      navigation.navigate('VerseDetail', {
+                        chapterId,
+                        verseNum,
+                        hi,
+                        en,
+                        isKeyVerse,
+                      });
+                    }}
+                    style={({ pressed }) => [
                       styles.suggestionCard,
                       {
                         backgroundColor: theme.surface,
                         borderColor: theme.cardBorder,
                         shadowColor: isLight ? '#1A1B3A' : '#000000',
                       },
+                      pressed && { opacity: 0.8 },
                     ]}
                   >
                     <View style={[styles.suggestionIconWrap, { backgroundColor: theme.accentSoft }]}>
@@ -180,7 +231,7 @@ export function SearchScreen({ navigation }: Props) {
                         {item.tag}
                       </Text>
                     </View>
-                  </View>
+                  </Pressable>
                 ))}
               </View>
             )}

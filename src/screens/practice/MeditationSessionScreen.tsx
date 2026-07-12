@@ -152,7 +152,7 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
     <View style={[styles.root, { backgroundColor: theme.background }]}>
       {/* Background Mandala */}
       <MandalaBG
-        opacity={isDark ? 0.035 : 0.055}
+        opacity={isDark ? 0.055 : 0.03}
         from={theme.gradientStart}
         via={theme.gradientMid}
         to={theme.gradientEnd}
@@ -225,7 +225,7 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
             <Text style={[styles.titleEn, { color: theme.text }]}>
               {titleEn}
             </Text>
-            <Text style={[styles.titleHi, { color: isDark ? PALETTE.saffronBright : theme.accentDeep }]}>
+            <Text style={[styles.titleHi, { color: isDark ? theme.accentBright : theme.accentDeep }]}>
               {titleHi}
             </Text>
           </View>
@@ -296,11 +296,11 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
               onPress={() => setIsPlaying(!isPlaying)}
             >
               {isPlaying ? (
-                <Svg width={24} height={24} viewBox="0 0 24 24" fill={isDark ? PALETTE.indigoDeep : '#fff'}>
+                <Svg width={24} height={24} viewBox="0 0 24 24" fill={isDark ? theme.background : '#fff'}>
                   <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                 </Svg>
               ) : (
-                <Svg width={24} height={24} viewBox="0 0 24 24" fill={isDark ? PALETTE.indigoDeep : '#fff'} style={{ marginLeft: 3 }}>
+                <Svg width={24} height={24} viewBox="0 0 24 24" fill={isDark ? theme.background : '#fff'} style={{ marginLeft: 3 }}>
                   <Path d="M8 5v14l11-7z" />
                 </Svg>
               )}

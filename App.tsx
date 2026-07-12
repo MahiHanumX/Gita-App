@@ -21,6 +21,7 @@ import { RootNavigator } from './src/navigation/RootNavigator';
 import { ThemeProvider } from './src/theme';
 import { LocaleProvider } from './src/i18n';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SavedVersesProvider } from './src/api_data/SavedVersesContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -50,10 +51,12 @@ export default function App() {
     <SafeAreaProvider>
       <LocaleProvider>
         <ThemeProvider>
-          <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-            <StatusBar style="light" />
-            <RootNavigator />
-          </View>
+          <SavedVersesProvider>
+            <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+              <StatusBar style="light" />
+              <RootNavigator />
+            </View>
+          </SavedVersesProvider>
         </ThemeProvider>
       </LocaleProvider>
     </SafeAreaProvider>

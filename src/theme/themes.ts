@@ -48,8 +48,8 @@ export const darkTheme = {
 /** Light lotus theme — soft white & pink */
 export const lightLotusTheme = {
   mode: 'light' as const,
-  background: '#FFFBFC',
-  backgroundAlt: '#FFF5F8',
+  background: '#F8F9FF',
+  backgroundAlt: '#0b0a0bff',
   gradientStart: '#FFFFFF',
   gradientMid: '#FFF5F8',
   gradientEnd: '#FFE8F0',

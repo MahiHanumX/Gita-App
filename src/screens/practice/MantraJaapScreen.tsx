@@ -113,7 +113,7 @@ export function MantraJaapScreen({ navigation }: Props) {
   const getBeadColor = (index: number) => {
     if (index === 0) {
       // Sumeru (Guru) bead - special color
-      return isDark ? PALETTE.saffronBright : theme.accentDeep;
+      return isDark ? theme.accentBright : theme.accentDeep;
     }
     if (index <= completedBeadCount) {
       // Completed beads
@@ -124,10 +124,10 @@ export function MantraJaapScreen({ navigation }: Props) {
   };
 
   return (
-    <Pressable style={styles.root} onPress={handleTapScreen}>
+    <Pressable style={[styles.root, { backgroundColor: theme.background }]} onPress={handleTapScreen}>
       {/* Background */}
       <MandalaBG
-        opacity={isDark ? 0.035 : 0.055}
+        opacity={isDark ? 0.055 : 0.03}
         from={theme.gradientStart}
         via={theme.gradientMid}
         to={theme.gradientEnd}
@@ -157,7 +157,7 @@ export function MantraJaapScreen({ navigation }: Props) {
         <View style={styles.centerContent}>
           {/* Mantra Text */}
           <View style={styles.mantraContainer}>
-            <Text style={[styles.mantraDev, { color: isDark ? PALETTE.saffronBright : theme.accentDeep }]}>
+            <Text style={[styles.mantraDev, { color: isDark ? theme.accentBright : theme.accentDeep }]}>
               ॐ नमो भगवते वासुदेवाय
             </Text>
             <Text style={[styles.mantraEn, { color: theme.text }]}>
@@ -258,20 +258,20 @@ export function MantraJaapScreen({ navigation }: Props) {
             <View style={styles.btnPlayPauseContent}>
               {isPlaying ? (
                 <>
-                  <Svg width={14} height={14} viewBox="0 0 24 24" fill={isDark ? PALETTE.indigoDeep : '#fff'}>
+                  <Svg width={14} height={14} viewBox="0 0 24 24" fill={isDark ? theme.background : '#fff'}>
                     <Rect x={4} y={3} width={4} height={18} rx={1} />
                     <Rect x={16} y={3} width={4} height={18} rx={1} />
                   </Svg>
-                  <Text style={[styles.btnPlayPauseText, { color: isDark ? PALETTE.indigoDeep : '#fff' }]}>
+                  <Text style={[styles.btnPlayPauseText, { color: isDark ? theme.background : '#fff' }]}>
                     Pause · विराम
                   </Text>
                 </>
               ) : (
                 <>
-                  <Svg width={14} height={14} viewBox="0 0 24 24" fill={isDark ? PALETTE.indigoDeep : '#fff'}>
+                  <Svg width={14} height={14} viewBox="0 0 24 24" fill={isDark ? theme.background : '#fff'}>
                     <Path d="M8 5v14l11-7z" />
                   </Svg>
-                  <Text style={[styles.btnPlayPauseText, { color: isDark ? PALETTE.indigoDeep : '#fff' }]}>
+                  <Text style={[styles.btnPlayPauseText, { color: isDark ? theme.background : '#fff' }]}>
                     Resume · आरंभ
                   </Text>
                 </>
