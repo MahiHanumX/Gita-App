@@ -7,6 +7,8 @@ export {
   ACTIVE_DAY_PREVIEW_MOCK,
   buildPathNodes,
   buildPathSvgD,
+  getMockCurrentDay,
+  setMockCurrentDay,
 } from './path.mock';
 export { CHAPTER_CTA_MOCK, DAILY_PRACTICE_MOCK, DAY_SHEET_CTA_MOCK } from './chapters.mock';
 export { LIBRARY_MOCK } from './library.mock';

@@ -1,9 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { PathScreen } from '../screens/path/PathScreen';
-import { LibraryScreen } from '../screens/library/LibraryScreen';
+import { LibraryNavigator } from './LibraryNavigator';
 import { PracticeHomeScreen } from '../screens/practice/PracticeHomeScreen';
-import { ProfileScreen } from '../screens/profile/ProfileScreen';
+import { ProfileNavigator } from './ProfileNavigator';
 import { DiyaIcon } from '../components/Icons';
 import { MainTabParamList } from './types';
 import { darkTheme, lightLotusTheme } from '../theme/themes';
@@ -81,7 +81,7 @@ export function MainTabNavigator() {
       <Tab.Screen name="Path" component={PathScreen} options={{ tabBarLabel: t.tabs.path }} />
       <Tab.Screen
         name="Library"
-        component={LibraryScreen}
+        component={LibraryNavigator}
         options={{
           tabBarLabel: t.tabs.library,
           tabBarStyle: lightTabBar,
@@ -90,7 +90,7 @@ export function MainTabNavigator() {
         }}
       />
       <Tab.Screen name="Practice" component={PracticeHomeScreen} options={{ tabBarLabel: t.tabs.practice }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: t.tabs.profile }} />
+      <Tab.Screen name="Profile" component={ProfileNavigator} options={{ tabBarLabel: t.tabs.profile }} />
     </Tab.Navigator>
   );
 }

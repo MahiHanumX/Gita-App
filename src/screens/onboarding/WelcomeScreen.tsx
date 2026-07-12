@@ -102,7 +102,7 @@ export function WelcomeScreen({ navigation }: Props) {
     return (
         <Shell>
             <View style={styles.skipRow}>
-                <Pressable onPress={() => navigation.navigate('Intention')}>
+                <Pressable onPress={() => navigation.getParent()?.reset({ index: 0, routes: [{ name: 'Main' }] })}>
                     <Text style={[styles.skip, { color: theme.textMuted }]}>{t.common.skip}</Text>
                 </Pressable>
             </View>
@@ -146,7 +146,6 @@ export function WelcomeScreen({ navigation }: Props) {
                     label={activeIndex === slides.length - 1 ? t.common.begin : t.common.continue}
                     subLabel={activeIndex === slides.length - 1 ? t.common.begin : t.common.continue}
                     onPress={handlePress}
-                    variant={resolvedMode}
                 />
             </View>
         </Shell>

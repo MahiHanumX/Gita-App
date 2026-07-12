@@ -92,7 +92,6 @@ export function IntentionScreen({ navigation }: Props) {
           label={t.common.continue}
           subLabel={t.common.continue}
           onPress={() => navigation.navigate('Commitment')}
-          variant={resolvedMode}
         />
       </View>
     </Shell>

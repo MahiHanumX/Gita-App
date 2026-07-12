@@ -3,6 +3,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { OnboardingNavigator } from './OnboardingNavigator';
 import { MainTabNavigator } from './MainTabNavigator';
 import { ChapterFlowNavigator } from './ChapterFlowNavigator';
+import { MantraJaapScreen } from '../screens/practice/MantraJaapScreen';
+import { MeditationSessionScreen } from '../screens/practice/MeditationSessionScreen';
 import { RootStackParamList } from './types';
 import { PALETTE } from '../theme/palette';
 
@@ -29,6 +31,16 @@ export function RootNavigator() {
         <Stack.Screen
           name="ChapterFlow"
           component={ChapterFlowNavigator}
+          options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="MantraJaap"
+          component={MantraJaapScreen}
+          options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="MeditationSession"
+          component={MeditationSessionScreen}
           options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
         />
       </Stack.Navigator>

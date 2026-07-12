@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { MandalaBG } from '../../components/MandalaBG';
@@ -6,8 +6,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { usePracticeHub } from '../../api_data/hooks';
 import { useTranslation } from '../../i18n';
 import { PALETTE } from '../../theme/palette';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { CompositeScreenProps } from '@react-navigation/native';
+import { MainTabParamList, RootStackParamList } from '../../navigation/types';
 
-export function PracticeHomeScreen() {
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<MainTabParamList, 'Practice'>,
+  NativeStackScreenProps<RootStackParamList>
+>;
+
+export function PracticeHomeScreen({ navigation }: Props) {
   const { data } = usePracticeHub();
   const t = useTranslation();
   if (!data) return null;
@@ -24,7 +33,14 @@ export function PracticeHomeScreen() {
         </View>
 
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <View style={styles.suggestion}>
+          <Pressable
+            style={({ pressed }) => [styles.suggestion, pressed && { opacity: 0.95 }]}
+            onPress={() => navigation.navigate('MeditationSession', {
+              sessionId: 'breathwork-warrior',
+              titleEn: 'Breath of the Warrior',
+              titleHi: 'वीर श्वास',
+            })}
+          >
             <LinearGradient colors={['rgba(232,168,56,0.22)', 'rgba(232,168,56,0.08)']} style={styles.suggestionInner}>
               <View style={styles.playIcon}>
                 <Svg width={26} height={26} viewBox="0 0 24 24" fill="none">
@@ -38,16 +54,32 @@ export function PracticeHomeScreen() {
                 <Text style={styles.suggestedHi}>{suggestion.hindiSubtitle}</Text>
               </View>
             </LinearGradient>
-          </View>
+          </Pressable>
 
           <Text style={styles.sectionLabel}>{t.common.explore}</Text>
           <View style={styles.grid}>
             {tiles.map((tile) => (
-              <LinearGradient key={tile.id} colors={tile.gradient} style={styles.tile}>
-                <Text style={styles.tileHi}>{tile.hi}</Text>
-                <Text style={styles.tileEn}>{tile.en}</Text>
-                <Text style={styles.tileCount}>{tile.count}</Text>
-              </LinearGradient>
+              <Pressable
+                key={tile.id}
+                style={({ pressed }) => [styles.tilePressable, pressed && { opacity: 0.85 }]}
+                onPress={() => {
+                  if (tile.id === 'mantra') {
+                    navigation.navigate('MantraJaap');
+                  } else {
+                    navigation.navigate('MeditationSession', {
+                      sessionId: tile.id,
+                      titleEn: tile.en === 'Meditation' ? 'Stillness of the River' : tile.en,
+                      titleHi: tile.en === 'Meditation' ? 'नदी की शांति' : tile.hi,
+                    });
+                  }
+                }}
+              >
+                <LinearGradient colors={tile.gradient} style={styles.tile}>
+                  <Text style={styles.tileHi}>{tile.hi}</Text>
+                  <Text style={styles.tileEn}>{tile.en}</Text>
+                  <Text style={styles.tileCount}>{tile.count}</Text>
+                </LinearGradient>
+              </Pressable>
             ))}
           </View>
         </ScrollView>
@@ -124,8 +156,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 12,
   },
-  tile: {
+  tilePressable: {
     width: '47%',
+  },
+  tile: {
+    width: '100%',
     borderRadius: 18,
     padding: 16,
     minHeight: 120,

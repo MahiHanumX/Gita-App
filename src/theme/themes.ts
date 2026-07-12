@@ -1,3 +1,13 @@
+export const typography = {
+  heading: 'Poppins_600SemiBold',
+  medium: 'Poppins_500Medium',
+  body: 'Poppins_400Regular',
+  hindi: 'NotoSansDevanagari_400Regular',
+  hindiMedium: 'NotoSansDevanagari_500Medium',
+  serif: 'PlayfairDisplay_600SemiBold',
+  serifItalic: 'PlayfairDisplay_400Regular_Italic',
+};
+
 /** Dark theme — indigo & saffron (default app experience) */
 export const darkTheme = {
   mode: 'dark' as const,
@@ -32,6 +42,7 @@ export const darkTheme = {
   tabActive: '#f4c257',
   tabInactive: 'rgba(245,236,216,0.62)',
   statusBar: 'light' as const,
+  fonts: typography,
 };
 
 /** Light lotus theme — soft white & pink */
@@ -68,6 +79,7 @@ export const lightLotusTheme = {
   tabActive: '#D9869A',
   tabInactive: 'rgba(92, 61, 74, 0.45)',
   statusBar: 'dark' as const,
+  fonts: typography,
 };
 
 export type AppTheme = typeof darkTheme | typeof lightLotusTheme;

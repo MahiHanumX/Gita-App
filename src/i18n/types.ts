@@ -22,8 +22,11 @@ export type TranslationSchema = {
     or: string;
     reflect: string;
     chapters: string;
+    chapterPrefix: string;
     explore: string;
     verses: string;
+    done: string;
+    keyVerse: string;
     weeks: string;
     language: string;
     selectLanguage: string;
@@ -52,5 +55,39 @@ export type TranslationSchema = {
   profile: {
     you: string;
     practiceHeatmap: string;
+  };
+  milestones: {
+    unlocked: string;
+    share: string;
+    continue: string;
+    continueSub: string;
+    d7: {
+      label: string;
+      hindi: string;
+      quote: string;
+      quoteHindi: string;
+      desc: string;
+    };
+    d21: {
+      label: string;
+      hindi: string;
+      quote: string;
+      quoteHindi: string;
+      desc: string;
+    };
+    d40: {
+      label: string;
+      hindi: string;
+      quote: string;
+      quoteHindi: string;
+      desc: string;
+    };
+    default: {
+      label: string;
+      hindi: string;
+      quote: string;
+      quoteHindi: string;
+      desc: string;
+    };
   };
 };

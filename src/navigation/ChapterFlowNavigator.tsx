@@ -4,6 +4,7 @@ import { TeachingScreen } from '../screens/chapters/TeachingScreen';
 import { TaskScreen } from '../screens/chapters/TaskScreen';
 import { ReflectScreen } from '../screens/chapters/ReflectScreen';
 import { CompleteChapterScreen } from '../screens/chapters/CompleteChapterScreen';
+import { MilestoneCompleteScreen } from '../screens/path/MilestoneCompleteScreen';
 import { ChapterFlowParamList } from './types';
 
 const Stack = createNativeStackNavigator<ChapterFlowParamList>();
@@ -22,6 +23,7 @@ export function ChapterFlowNavigator() {
       <Stack.Screen name="Task" component={TaskScreen} />
       <Stack.Screen name="Reflect" component={ReflectScreen} />
       <Stack.Screen name="Complete" component={CompleteChapterScreen} />
+      <Stack.Screen name="MilestoneComplete" component={MilestoneCompleteScreen} />
     </Stack.Navigator>
   );
 }

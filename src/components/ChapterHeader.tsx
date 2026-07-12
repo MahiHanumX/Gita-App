@@ -1,39 +1,39 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { darkTheme, lightLotusTheme } from '../theme/themes';
-import type { ThemeMode } from '../theme/themes';
+import { useTheme } from '../theme';
 
 type ChapterHeaderProps = {
   step: number;
   total: number;
   onBack?: () => void;
   onClose?: () => void;
-  tone?: ThemeMode;
 };
 
-function ProgressBar({ step, total, tone }: { step: number; total: number; tone: ThemeMode }) {
-  const t = tone === 'light' ? lightLotusTheme : darkTheme;
+function ProgressBar({ step, total }: { step: number; total: number }) {
+  const { theme } = useTheme();
   return (
     <View style={styles.progressRow}>
       {Array.from({ length: total }).map((_, i) => (
-        <View key={i} style={[styles.progressTrack, { backgroundColor: t.progressTrack }]}>
-          {i < step ? <View style={[styles.progressFill, { backgroundColor: t.progressFill }]} /> : null}
+        <View key={i} style={[styles.progressTrack, { backgroundColor: theme.progressTrack }]}>
+          {i < step ? (
+            <View style={[styles.progressFill, { backgroundColor: theme.progressFill }]} />
+          ) : null}
         </View>
       ))}
     </View>
   );
 }
 
-export function ChapterHeader({ step, total, onBack, onClose, tone = 'dark' }: ChapterHeaderProps) {
-  const t = tone === 'light' ? lightLotusTheme : darkTheme;
+export function ChapterHeader({ step, total, onBack, onClose }: ChapterHeaderProps) {
+  const { theme } = useTheme();
 
   return (
     <View style={styles.row}>
-      <Pressable onPress={onBack} style={[styles.iconBtn, { backgroundColor: t.iconButtonBg }]}>
+      <Pressable onPress={onBack} style={[styles.iconBtn, { backgroundColor: theme.iconButtonBg }]}>
         <Svg width={16} height={16} viewBox="0 0 24 24">
           <Path
             d="M15 5 L 8 12 L 15 19"
-            stroke={t.iconStroke}
+            stroke={theme.iconStroke}
             strokeWidth={2.4}
             fill="none"
             strokeLinecap="round"
@@ -41,14 +41,16 @@ export function ChapterHeader({ step, total, onBack, onClose, tone = 'dark' }: C
           />
         </Svg>
       </Pressable>
+
       <View style={styles.progressWrap}>
-        <ProgressBar step={step} total={total} tone={tone} />
+        <ProgressBar step={step} total={total} />
       </View>
-      <Pressable onPress={onClose} style={[styles.iconBtn, { backgroundColor: t.iconButtonBg }]}>
+
+      <Pressable onPress={onClose} style={[styles.iconBtn, { backgroundColor: theme.iconButtonBg }]}>
         <Svg width={12} height={12} viewBox="0 0 24 24">
           <Path
             d="M5 5 L 19 19 M 19 5 L 5 19"
-            stroke={t.iconStroke}
+            stroke={theme.iconStroke}
             strokeWidth={2.4}
             fill="none"
             strokeLinecap="round"

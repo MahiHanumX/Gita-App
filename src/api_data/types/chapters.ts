@@ -1,13 +1,17 @@
 export type ChapterStepType = 'shloka' | 'teaching' | 'task' | 'reflect' | 'complete';
 
-export type ShlokaStep = {
-  type: 'shloka';
-  chipHi: string;
-  chipEn: string;
+export type ShlokaCard = {
   lines: string[];
   subLines: string[];
   transliteration: string;
   reference: string;
+};
+
+export type ShlokaStep = {
+  type: 'shloka';
+  chipHi: string;
+  chipEn: string;
+  shlokas: ShlokaCard[];
 };
 
 export type TeachingStep = {

@@ -46,12 +46,14 @@ export function usePathJourney() {
   return useApiData(() => fetchPathJourney(language), buildPathFallback(language), [language]);
 }
 
-export function useDailyPractice(dayId = 13) {
+export function useDailyPractice(dayId?: number) {
   const { language } = useLocale();
+  const { data: journey } = usePathJourney();
+  const resolvedDayId = dayId ?? journey?.currentDay ?? 13;
   return useApiData(
-    () => fetchDailyPractice(dayId, language),
-    getLocalizedDailyPractice(language, dayId),
-    [dayId, language],
+    () => fetchDailyPractice(resolvedDayId, language),
+    getLocalizedDailyPractice(language, resolvedDayId),
+    [resolvedDayId, language],
   );
 }
 

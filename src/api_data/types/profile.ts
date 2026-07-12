@@ -6,6 +6,16 @@ export type ProfileStat = {
   accent?: boolean;
 };
 
+export type JourneyEntry = {
+  day: number;
+  date: string;
+  hi: string;
+  en: string;
+  quote: string | null;
+  mood: string | null;
+  skipped?: boolean;
+};
+
 export type UserProfile = {
   id: string;
   name: string;
@@ -15,4 +25,5 @@ export type UserProfile = {
   heatmapWeeks: number;
   heatmapLevels: string[];
   heatmapData: number[];
+  journeyEntries: JourneyEntry[];
 };

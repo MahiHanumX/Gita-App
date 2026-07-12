@@ -22,3 +22,16 @@ export type LibraryContent = {
   verseOfDay: VerseOfDay;
   chapters: LibraryChapter[];
 };
+
+export type Verse = {
+  n: number;
+  key: boolean;
+  hi: string;
+  en: string;
+};
+
+export type SuggestedSearch = {
+  hi: string;
+  en: string;
+  tag: string;
+};

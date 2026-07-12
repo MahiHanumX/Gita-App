@@ -11,6 +11,9 @@ const en: TranslationSchema = {
     chapters: 'Chapters',
     explore: 'Explore',
     verses: 'verses',
+    chapterPrefix: 'Chapter',
+    done: 'done',
+    keyVerse: 'Key',
     weeks: 'weeks',
     language: 'Language',
     selectLanguage: 'Choose your language',
@@ -28,6 +31,40 @@ const en: TranslationSchema = {
   auth: { guest: 'Continue as guest' },
   path: { day: 'Day', min: 'min', chapterCount: 'chapters', reflect: 'Reflect', startPractice: "Start Today's Practice", startPracticeSub: 'Begin today\'s practice' },
   profile: { you: 'You', practiceHeatmap: 'Practice' },
+  milestones: {
+    unlocked: 'Milestone Unlocked',
+    share: 'Share',
+    continue: 'Continue Journey',
+    continueSub: 'यात्रा जारी रखें',
+    d7: {
+      label: 'Karma Yoga',
+      hindi: 'कर्मयोग',
+      quote: 'Seven lamps, one flame.',
+      quoteHindi: 'सात दीप, एक ज्योति।',
+      desc: "You've completed the first path of Karma Yoga. The next stretch opens tomorrow — walk gently.",
+    },
+    d21: {
+      label: 'Bhakti Yoga',
+      hindi: 'भक्तियोग',
+      quote: 'Lost in the ocean of love.',
+      quoteHindi: 'प्रेम के सागर में लीन।',
+      desc: "You've crossed the path of Bhakti Yoga. Let your devotion light the remainder of your journey.",
+    },
+    d40: {
+      label: 'Jnana Yoga',
+      hindi: 'ज्ञानयोग',
+      quote: 'The flame becomes the sun.',
+      quoteHindi: 'ज्योति सूर्य बन गई।',
+      desc: "You've completed the 40-day journey of the Bhagavad Gita. The path of wisdom and liberation is now fully open within you.",
+    },
+    default: {
+      label: 'Daily Path',
+      hindi: 'दैनिक साधना',
+      quote: 'The lamp is lit.',
+      quoteHindi: 'दीप प्रज्वलित है।',
+      desc: "You held today's teaching gently. Rest in it — the practice continues in how you live.",
+    },
+  },
 };
 
 export default en;

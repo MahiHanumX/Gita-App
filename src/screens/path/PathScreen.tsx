@@ -214,7 +214,7 @@ function DaySheet({
             </View>
           ))}
         </View>
-        <CTA variant={resolvedMode} label={t.path.startPractice} subLabel={t.path.startPracticeSub} onPress={onStart} />
+        <CTA label={t.path.startPractice} subLabel={t.path.startPracticeSub} onPress={onStart} />
       </View>
     </View>
   );

@@ -1,4 +1,4 @@
-import type { UserProfile } from '../types';
+import type { UserProfile, JourneyEntry } from '../types';
 
 export const HEATMAP_COLORS_MOCK = [
   'rgba(245,236,216,0.08)',
@@ -19,6 +19,14 @@ export function buildHeatmapData(length = 56): number[] {
   });
 }
 
+export const JOURNEY_ENTRIES_MOCK: JourneyEntry[] = [
+  { day: 13, date: 'Today', hi: 'निष्काम कर्म', en: 'Action Without Attachment', quote: 'I noticed the pull when I checked my phone after sending the email…', mood: 'softer' },
+  { day: 12, date: 'Yesterday', hi: 'सत्य', en: 'Truthfulness', quote: 'It\'s easier to be kind than honest — today I tried to be both.', mood: 'clear' },
+  { day: 11, date: 'Sun, Jul 6', hi: 'क्षमा', en: 'Forgiveness', quote: 'Wrote a letter I\'ll never send. That was the whole point.', mood: 'lighter' },
+  { day: 10, date: 'Sat, Jul 5', hi: 'दान', en: 'Giving', quote: null, mood: null, skipped: true },
+  { day: 9, date: 'Fri, Jul 4', hi: 'साक्षी', en: 'The Witness', quote: 'Watching thoughts without becoming them. Difficult and freeing.', mood: 'observing' },
+];
+
 export const PROFILE_MOCK: UserProfile = {
   id: 'user-001',
   name: 'Ananya Sharma',
@@ -32,4 +40,5 @@ export const PROFILE_MOCK: UserProfile = {
   heatmapWeeks: 8,
   heatmapLevels: HEATMAP_COLORS_MOCK,
   heatmapData: buildHeatmapData(),
+  journeyEntries: JOURNEY_ENTRIES_MOCK,
 };

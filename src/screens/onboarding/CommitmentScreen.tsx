@@ -106,7 +106,6 @@ export function CommitmentScreen({ navigation }: Props) {
           label={t.onboarding.lightLamp}
           subLabel={t.onboarding.lightLamp}
           onPress={() => navigation.navigate('SignIn')}
-          variant={resolvedMode}
         />
       </View>
     </Shell>

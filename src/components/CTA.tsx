@@ -1,35 +1,40 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { darkTheme, lightLotusTheme } from '../theme/themes';
-import type { ThemeMode } from '../theme/themes';
+import { useTheme } from '../theme';
 
 export type CTAProps = {
   label: string;
   subLabel?: string;
   onPress?: () => void;
   disabled?: boolean;
-  variant?: ThemeMode;
 };
 
-export function CTA({ label, subLabel, onPress, disabled, variant = 'dark' }: CTAProps) {
-  const t = variant === 'light' ? lightLotusTheme : darkTheme;
+export function CTA({ label, subLabel, onPress, disabled }: CTAProps) {
+  const { theme, resolvedMode } = useTheme();
+  const isLight = resolvedMode === 'light';
+
+  const gradient = disabled
+    ? isLight
+      ? (['#F0E0E6', '#E8D0DA'] as const)
+      : (['#d9c9a2', '#b8a37a'] as const)
+    : (theme.ctaGradient as unknown as [string, string, string]);
 
   return (
-    <Pressable onPress={onPress} disabled={disabled} style={({ pressed }) => [pressed && !disabled && { opacity: 0.92 }]}>
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      style={({ pressed }) => [pressed && !disabled && { opacity: 0.92 }]}
+    >
       <LinearGradient
-        colors={
-          disabled
-            ? variant === 'light'
-              ? ['#F0E0E6', '#E8D0DA']
-              : ['#d9c9a2', '#b8a37a']
-            : [...t.ctaGradient]
-        }
+        colors={gradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.button}
       >
-        <Text style={[styles.label, { color: t.ctaText }]}>{label}</Text>
-        {subLabel ? <Text style={[styles.subLabel, { color: t.ctaText }]}>{subLabel}</Text> : null}
+        <Text style={[styles.label, { color: theme.ctaText }]}>{label}</Text>
+        {subLabel ? (
+          <Text style={[styles.subLabel, { color: theme.ctaText }]}>{subLabel}</Text>
+        ) : null}
       </LinearGradient>
     </Pressable>
   );

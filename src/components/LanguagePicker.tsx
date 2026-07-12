@@ -1,10 +1,14 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useMemo } from 'react';
 import { useLocale } from '../i18n';
-import { PALETTE } from '../theme/palette';
+import { useTheme } from '../theme';
+import type { AppTheme } from '../theme/themes';
 import type { AppLanguage } from '../i18n/types';
 
 export function LanguagePicker() {
   const { language, setLanguage, languages, t } = useLocale();
+  const { theme } = useTheme();
+  const styles = useMemo(() => getStyles(theme), [theme]);
 
   return (
     <View style={styles.section}>
@@ -29,24 +33,24 @@ export function LanguagePicker() {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: AppTheme) => StyleSheet.create({
   section: {
     paddingHorizontal: 24,
     paddingTop: 8,
     paddingBottom: 24,
   },
   sectionLabel: {
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: theme.fonts.heading,
     fontSize: 11,
-    color: PALETTE.textOnDarkMuted,
+    color: theme.accent,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     marginBottom: 4,
   },
   sectionHint: {
-    fontFamily: 'Poppins_400Regular',
+    fontFamily: theme.fonts.body,
     fontSize: 13,
-    color: PALETTE.textOnDarkMuted,
+    color: theme.textMuted,
     marginBottom: 14,
   },
   grid: {
@@ -59,24 +63,24 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderRadius: 14,
-    backgroundColor: 'rgba(245,236,216,0.06)',
+    backgroundColor: theme.surfaceSoft,
     borderWidth: 1.5,
-    borderColor: 'rgba(245,236,216,0.12)',
+    borderColor: theme.cardBorder,
   },
   chipSelected: {
-    backgroundColor: 'rgba(232,168,56,0.18)',
-    borderColor: 'rgba(232,168,56,0.55)',
+    backgroundColor: theme.accentSoft,
+    borderColor: theme.accentBorder,
   },
   chipNative: {
-    fontFamily: 'NotoSansDevanagari_500Medium',
+    fontFamily: theme.fonts.hindiMedium,
     fontSize: 16,
-    color: PALETTE.cream,
+    color: theme.text,
   },
   chipName: {
     marginTop: 2,
-    fontFamily: 'Poppins_400Regular',
+    fontFamily: theme.fonts.body,
     fontSize: 11,
-    color: PALETTE.textOnDarkMuted,
+    color: theme.textMuted,
   },
-  chipTextSelected: { color: PALETTE.saffronBright },
+  chipTextSelected: { color: theme.accent },
 });
