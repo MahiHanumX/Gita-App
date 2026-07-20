@@ -5,6 +5,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { LightShell } from '../../components/LightShell';
 import { LanguagePicker } from '../../components/LanguagePicker';
+import { DiyaIcon } from '../../components/DiyaIcon';
 import { useUserProfile } from '../../api_data/hooks';
 import { useTranslation } from '../../i18n';
 import { ProfileStackParamList } from '../../navigation/types';
@@ -134,6 +135,32 @@ export function ProfileScreen({ navigation }: Props) {
               <BadgeChip icon="fire" label="30-day" hindi="अग्नि" earned mini />
             </View>
           </View>
+
+          <Pressable
+            onPress={() => navigation.navigate('Support')}
+            style={({ pressed }) => [
+              styles.supportBanner,
+              pressed && { opacity: 0.9 }
+            ]}
+          >
+            <LinearGradient
+              colors={theme.mode === 'light' ? ['rgba(232,164,184,0.15)', 'rgba(232,164,184,0.05)'] : ['rgba(232,168,56,0.18)', 'rgba(232,168,56,0.04)']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.supportGradient}
+            >
+              <View style={styles.supportLeft}>
+                <View style={styles.supportIconWrap}>
+                  <DiyaIcon size={18} color={theme.mode === 'light' ? '#5C3D4A' : '#0f102b'} flameColor={theme.mode === 'light' ? '#E8A4B8' : '#e8a838'} />
+                </View>
+                <View>
+                  <Text style={styles.supportTitle}>Support Deep · दान</Text>
+                  <Text style={styles.supportSubtitle}>Keep the app free for everyone</Text>
+                </View>
+              </View>
+              <Text style={styles.supportChevron}>→</Text>
+            </LinearGradient>
+          </Pressable>
 
           <View style={{ paddingBottom: 32 }}>
             <LanguagePicker />
@@ -373,6 +400,51 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     color: theme.textMuted,
   },
   badgeHindiEarned: {
+    color: theme.accent,
+  },
+  supportBanner: {
+    marginHorizontal: 24,
+    marginTop: 22,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: theme.accentBorder,
+    overflow: 'hidden',
+  },
+  supportGradient: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  supportLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  supportIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: theme.accentSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  supportTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 14,
+    color: theme.text,
+  },
+  supportSubtitle: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.textMuted,
+    marginTop: 1,
+  },
+  supportChevron: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 16,
     color: theme.accent,
   },
 });

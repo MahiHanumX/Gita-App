@@ -4,6 +4,9 @@ export type RootStackParamList = {
   ChapterFlow: undefined;
   MantraJaap: undefined;
   MeditationSession: { sessionId?: string; titleEn?: string; titleHi?: string } | undefined;
+  SessionDetail: { sessionId?: string; titleEn?: string; titleHi?: string } | undefined;
+  SessionPause: undefined;
+  SessionComplete: undefined;
 };
 
 export type OnboardingStackParamList = {
@@ -19,6 +22,16 @@ export type MainTabParamList = {
   Library: undefined;
   Practice: undefined;
   Profile: undefined;
+};
+
+export type PracticeStackParamList = {
+  PracticeHome: undefined;
+  MeditationLibrary: undefined;
+  MantraLibrary: undefined;
+  BreathworkLibrary: undefined;
+  YogaNidraLibrary: undefined;
+  PracticeHistory: undefined;
+  PracticeSearch: undefined;
 };
 
 export type ChapterFlowParamList = {
@@ -44,4 +57,16 @@ export type ProfileStackParamList = {
   Reminder: undefined;
   LockScreenNotif: undefined;
   PathOverview: undefined;
+  Support: undefined;
+  SessionLength: undefined;
+  RestDays: undefined;
+  LanguagePicker: undefined;
+  TranslationSource: undefined;
+  ThemePicker: undefined;
+  TextSize: undefined;
+  NotificationsHub: undefined;
+  Account: undefined;
+  DataPrivacy: undefined;
+  About: undefined;
+  SignOutConfirm: undefined;
 };

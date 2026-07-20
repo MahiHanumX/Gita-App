@@ -3,7 +3,7 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { PathScreen } from '../screens/path/PathScreen';
 import { LibraryNavigator } from './LibraryNavigator';
-import { PracticeHomeScreen } from '../screens/practice/PracticeHomeScreen';
+import { PracticeNavigator } from './PracticeNavigator';
 import { ProfileNavigator } from './ProfileNavigator';
 import { DiyaIcon } from '../components/Icons';
 import { MainTabParamList } from './types';
@@ -65,8 +65,10 @@ export function MainTabNavigator() {
         const isProfileChild = route.name === 'Profile' && routeName && routeName !== 'ProfileHome';
         // Hide bottom tab bar on child screens of Library stack (e.g. ChapterDetail, Search, VerseDetail)
         const isLibraryChild = route.name === 'Library' && routeName && routeName !== 'LibraryHome';
+        // Hide bottom tab bar on child screens of Practice stack
+        const isPracticeChild = route.name === 'Practice' && routeName && routeName !== 'PracticeHome';
 
-        const shouldHideTabBar = isProfileChild || isLibraryChild;
+        const shouldHideTabBar = isProfileChild || isLibraryChild || isPracticeChild;
 
         return {
           headerShown: false,
@@ -86,7 +88,7 @@ export function MainTabNavigator() {
     >
       <Tab.Screen name="Path" component={PathScreen} options={{ tabBarLabel: t.tabs.path }} />
       <Tab.Screen name="Library" component={LibraryNavigator} options={{ tabBarLabel: t.tabs.library }} />
-      <Tab.Screen name="Practice" component={PracticeHomeScreen} options={{ tabBarLabel: t.tabs.practice }} />
+      <Tab.Screen name="Practice" component={PracticeNavigator} options={{ tabBarLabel: t.tabs.practice }} />
       <Tab.Screen name="Profile" component={ProfileNavigator} options={{ tabBarLabel: t.tabs.profile }} />
     </Tab.Navigator>
   );

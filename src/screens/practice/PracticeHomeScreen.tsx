@@ -8,12 +8,12 @@ import { useTranslation } from '../../i18n';
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CompositeScreenProps } from '@react-navigation/native';
-import { MainTabParamList, RootStackParamList } from '../../navigation/types';
+import { PracticeStackParamList, RootStackParamList } from '../../navigation/types';
 import { useTheme } from '../../theme';
 import { AppTheme } from '../../theme/themes';
 
 type Props = CompositeScreenProps<
-  BottomTabScreenProps<MainTabParamList, 'Practice'>,
+  NativeStackScreenProps<PracticeStackParamList, 'PracticeHome'>,
   NativeStackScreenProps<RootStackParamList>
 >;
 
@@ -66,13 +66,13 @@ export function PracticeHomeScreen({ navigation }: Props) {
               style={({ pressed }) => [styles.tilePressable, pressed && { opacity: 0.85 }]}
               onPress={() => {
                 if (tile.id === 'mantra') {
-                  navigation.navigate('MantraJaap');
+                  navigation.navigate('MantraLibrary');
+                } else if (tile.id === 'breathwork') {
+                  navigation.navigate('BreathworkLibrary');
+                } else if (tile.id === 'yoganidra') {
+                  navigation.navigate('YogaNidraLibrary');
                 } else {
-                  navigation.navigate('MeditationSession', {
-                    sessionId: tile.id,
-                    titleEn: tile.en === 'Meditation' ? 'Stillness of the River' : tile.en,
-                    titleHi: tile.en === 'Meditation' ? 'नदी की शांति' : tile.hi,
-                  });
+                  navigation.navigate('MeditationLibrary');
                 }
               }}
             >

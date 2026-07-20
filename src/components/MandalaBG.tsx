@@ -3,13 +3,15 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Defs, G, Line, Pattern, Rect } from 'react-native-svg';
 
 
+import { useTheme } from '../theme';
+
 type MandalaBGProps = {
   opacity?: number;
-  from: string;
-  via: string;
-  to: string;
-  stroke: string;
-  glowColor: string;
+  from?: string;
+  via?: string;
+  to?: string;
+  stroke?: string;
+  glowColor?: string;
   showBottomGlow?: boolean;
 };
 
@@ -22,6 +24,14 @@ export function MandalaBG({
   glowColor,
   showBottomGlow = true,
 }: MandalaBGProps) {
+  const { theme } = useTheme();
+  
+  const bgFrom = from || theme.gradientStart;
+  const bgVia = via || theme.gradientMid;
+  const bgTo = to || theme.gradientEnd;
+  const mandalaStroke = stroke || theme.mandalaStroke;
+  const glow = glowColor || theme.accent;
+
   const petals = Array.from({ length: 12 }, (_, i) => {
     const a = (i * 30 * Math.PI) / 180;
     return {
@@ -39,19 +49,20 @@ export function MandalaBG({
 
   return (
     <View style={StyleSheet.absoluteFill}>
-      <LinearGradient colors={[from, via, to]} locations={[0, 0.55, 1]} style={StyleSheet.absoluteFill} />
-      <View style={[styles.glow, { backgroundColor: glowColor }]} />
-      {showBottomGlow && <View style={[styles.bottomGlow, { backgroundColor: glowColor }]} />}
+      <LinearGradient colors={[bgFrom, bgVia, bgTo]} locations={[0, 0.55, 1]} style={StyleSheet.absoluteFill} />
+      <View style={[styles.glow, { backgroundColor: glow }]} />
+      {showBottomGlow && <View style={[styles.bottomGlow, { backgroundColor: glow }]} />}
       <Svg width="100%" height="100%" style={[StyleSheet.absoluteFill, { opacity }]}>
         <Defs>
           <Pattern id="mandala" patternUnits="userSpaceOnUse" width={180} height={180}>
-            <G stroke={stroke} strokeWidth={0.8} fill="none">
-              <Circle cx={90} cy={90} r={70} />
+            <G stroke={mandalaStroke} strokeWidth={0.8} fill="none">
+              <Circle cx="90" cy="90" r="76" stroke={mandalaStroke} strokeWidth="0.8" />
+              <Circle cx="90" cy="90" r="70" stroke={mandalaStroke} strokeWidth="0.4" />
               <Circle cx={90} cy={90} r={52} />
               <Circle cx={90} cy={90} r={34} />
-              <Circle cx={90} cy={90} r={16} />
+              <Circle cx="90" cy="90" r="16" stroke={mandalaStroke} strokeWidth="0.6" />
               {petals.map((p, i) => (
-                <Line key={i} x1={p.x1} y1={p.y1} x2={p.x2} y2={p.y2} />
+                <Line key={i} x1={p.x1} y1={p.y1} x2={p.x2} y2={p.y2} stroke={mandalaStroke} strokeWidth="0.4" opacity="0.6" />
               ))}
               {dots.map((d, i) => (
                 <Circle key={i} cx={d.cx} cy={d.cy} r={3} />

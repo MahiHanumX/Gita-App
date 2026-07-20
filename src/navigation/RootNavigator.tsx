@@ -5,6 +5,9 @@ import { MainTabNavigator } from './MainTabNavigator';
 import { ChapterFlowNavigator } from './ChapterFlowNavigator';
 import { MantraJaapScreen } from '../screens/practice/MantraJaapScreen';
 import { MeditationSessionScreen } from '../screens/practice/MeditationSessionScreen';
+import { SessionDetailScreen } from '../screens/practice/states/SessionDetailScreen';
+import { SessionPauseScreen } from '../screens/practice/states/SessionPauseScreen';
+import { SessionCompleteScreen } from '../screens/practice/states/SessionCompleteScreen';
 import { RootStackParamList } from './types';
 import { useTheme } from '../theme';
 
@@ -47,6 +50,21 @@ export function RootNavigator() {
         <Stack.Screen
           name="MeditationSession"
           component={MeditationSessionScreen}
+          options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="SessionDetail"
+          component={SessionDetailScreen}
+          options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="SessionPause"
+          component={SessionPauseScreen}
+          options={{ presentation: 'transparentModal', animation: 'fade' }}
+        />
+        <Stack.Screen
+          name="SessionComplete"
+          component={SessionCompleteScreen}
           options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
         />
       </Stack.Navigator>
