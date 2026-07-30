@@ -13,9 +13,11 @@ export function SessionCompleteScreen() {
   const styles = useMemo(() => getStyles(theme), [theme]);
   const isLight = resolvedMode === 'light';
 
+  const accentColor = isLight ? theme.accentDeep : theme.accentBright;
+
   return (
     <View style={styles.container}>
-      <MandalaBG opacity={isLight ? 0.08 : 0.05} />
+      <MandalaBG />
 
       <View style={styles.content}>
         {/* Close button */}
@@ -37,8 +39,8 @@ export function SessionCompleteScreen() {
 
         {/* Message */}
         <View style={styles.messageArea}>
-          <Text style={styles.completeTag}>Session complete · पूर्ण</Text>
-          <Text style={styles.messageEn}>You returned{'\n'}<Text style={{ fontStyle: 'italic', color: theme.accentBright }}>to your breath.</Text></Text>
+          <Text style={[styles.completeTag, { color: accentColor }]}>Session complete · पूर्ण</Text>
+          <Text style={styles.messageEn}>You returned{'\n'}<Text style={{ fontStyle: 'italic', color: accentColor }}>to your breath.</Text></Text>
           <Text style={styles.messageHi}>श्वास लौट आई</Text>
         </View>
 
@@ -50,7 +52,7 @@ export function SessionCompleteScreen() {
             { v: '+1', hi: 'दिन', en: 'Streak day' },
           ].map((s, i) => (
             <View key={i} style={styles.statCard}>
-              <Text style={styles.statVal}>{s.v}</Text>
+              <Text style={[styles.statVal, { color: accentColor }]}>{s.v}</Text>
               <Text style={styles.statEn}>{s.en}</Text>
               <Text style={styles.statHi}>{s.hi}</Text>
             </View>
@@ -71,7 +73,7 @@ export function SessionCompleteScreen() {
               ].map((m, i) => (
                 <View key={i} style={[styles.moodOption, m.a && styles.moodOptionActive]}>
                   <Text style={[styles.moodEmoji, !m.a && { opacity: 0.5 }]}>{m.e}</Text>
-                  <Text style={[styles.moodLabel, m.a ? { color: theme.accentBright } : { color: theme.textMuted }]}>{m.l}</Text>
+                  <Text style={[styles.moodLabel, m.a ? { color: accentColor } : { color: theme.textMuted }]}>{m.l}</Text>
                 </View>
               ))}
             </View>
@@ -88,7 +90,7 @@ export function SessionCompleteScreen() {
             onPress={() => navigation.navigate('Main')}
           />
           <Pressable style={styles.reflectBtn}>
-            <Text style={styles.reflectBtnText}>Add a reflection ›</Text>
+            <Text style={[styles.reflectBtnText, { color: accentColor }]}>Add a reflection ›</Text>
           </Pressable>
         </View>
       </View>
@@ -147,7 +149,6 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
   completeTag: {
     fontFamily: theme.fonts.heading,
     fontSize: 11,
-    color: theme.accentBright,
     letterSpacing: 2,
     textTransform: 'uppercase',
   },
@@ -184,7 +185,6 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
   statVal: {
     fontFamily: theme.fonts.serif,
     fontSize: 26,
-    color: theme.accentBright,
   },
   statEn: {
     marginTop: 6,
@@ -254,6 +254,5 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
   reflectBtnText: {
     fontFamily: theme.fonts.medium,
     fontSize: 13,
-    color: theme.accentBright,
   },
 });

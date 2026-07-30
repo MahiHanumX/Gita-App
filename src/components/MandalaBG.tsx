@@ -16,7 +16,7 @@ type MandalaBGProps = {
 };
 
 export function MandalaBG({
-  opacity = 0.06,
+  opacity,
   from,
   via,
   to,
@@ -24,13 +24,17 @@ export function MandalaBG({
   glowColor,
   showBottomGlow = true,
 }: MandalaBGProps) {
-  const { theme } = useTheme();
-  
+  const { theme, resolvedMode } = useTheme();
+  const isLight = resolvedMode === 'light';
+
+  const defaultOpacity = isLight ? 0.08 : 0.04;
+  const mandalaOpacity = opacity ?? defaultOpacity;
+
   const bgFrom = from || theme.gradientStart;
   const bgVia = via || theme.gradientMid;
   const bgTo = to || theme.gradientEnd;
   const mandalaStroke = stroke || theme.mandalaStroke;
-  const glow = glowColor || theme.accent;
+  const glow = glowColor || (isLight ? theme.accentSoft : theme.accent);
 
   const petals = Array.from({ length: 12 }, (_, i) => {
     const a = (i * 30 * Math.PI) / 180;
@@ -52,7 +56,7 @@ export function MandalaBG({
       <LinearGradient colors={[bgFrom, bgVia, bgTo]} locations={[0, 0.55, 1]} style={StyleSheet.absoluteFill} />
       <View style={[styles.glow, { backgroundColor: glow }]} />
       {showBottomGlow && <View style={[styles.bottomGlow, { backgroundColor: glow }]} />}
-      <Svg width="100%" height="100%" style={[StyleSheet.absoluteFill, { opacity }]}>
+      <Svg width="100%" height="100%" style={[StyleSheet.absoluteFill, { opacity: mandalaOpacity }]}>
         <Defs>
           <Pattern id="mandala" patternUnits="userSpaceOnUse" width={180} height={180}>
             <G stroke={mandalaStroke} strokeWidth={0.8} fill="none">

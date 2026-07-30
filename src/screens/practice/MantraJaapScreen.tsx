@@ -1,10 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { StyleSheet, Text, View, Pressable, Animated, Vibration, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Circle, G, Path, Rect } from 'react-native-svg';
+import Svg, { Circle, G, Line, Path, Rect } from 'react-native-svg';
 import { useTheme } from '../../theme';
 import { MandalaBG } from '../../components/MandalaBG';
-import { PALETTE } from '../../theme/palette';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 
@@ -123,22 +122,17 @@ export function MantraJaapScreen({ navigation }: Props) {
     return isDark ? 'rgba(245, 236, 216, 0.22)' : 'rgba(92, 61, 74, 0.18)';
   };
 
+  const styles = useMemo(() => getStyles(theme), [theme]);
+
   return (
     <Pressable style={[styles.root, { backgroundColor: theme.background }]} onPress={handleTapScreen}>
       {/* Background */}
-      <MandalaBG
-        opacity={isDark ? 0.055 : 0.03}
-        from={theme.gradientStart}
-        via={theme.gradientMid}
-        to={theme.gradientEnd}
-        stroke={theme.mandalaStroke}
-        glowColor={theme.accentSoft}
-      />
+      <MandalaBG />
 
       <SafeAreaView style={styles.container}>
         {/* Custom Header */}
         <View style={styles.header}>
-          <Pressable style={styles.headerBtn} onPress={() => navigation.goBack()}>
+          <Pressable style={[styles.headerBtn, { backgroundColor: theme.iconButtonBg }]} onPress={() => navigation.goBack()}>
             <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
               <Path d="M15 19l-7-7 7-7" stroke={theme.text} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
             </Svg>
@@ -146,7 +140,7 @@ export function MantraJaapScreen({ navigation }: Props) {
 
           <Text style={[styles.headerTitle, { color: theme.text }]}>MANTRA JAAP</Text>
 
-          <Pressable style={styles.headerBtn} onPress={() => {}}>
+          <Pressable style={[styles.headerBtn, { backgroundColor: theme.iconButtonBg }]} onPress={() => {}}>
             <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
               <Path d="M4 6h16M4 12h16M4 18h16" stroke={theme.text} strokeWidth={2} strokeLinecap="round" />
             </Svg>
@@ -158,84 +152,123 @@ export function MantraJaapScreen({ navigation }: Props) {
           {/* Mantra Text */}
           <View style={styles.mantraContainer}>
             <Text style={[styles.mantraDev, { color: isDark ? theme.accentBright : theme.accentDeep }]}>
-              ॐ नमो भगवते वासुदेवाय
+              ॐ नमः शिवाय
             </Text>
             <Text style={[styles.mantraEn, { color: theme.text }]}>
-              Om Namo Bhagavate Vāsudevāya
+              Om Namah Shivaya
             </Text>
           </View>
 
-          {/* Bead circular counter */}
+          {/* Interactive Malabead Circle with Embedded Sacred Mandala */}
           <View style={styles.circleContainer}>
+            {/* SVG Beads Ring & Sacred Mandala */}
             <Svg width={270} height={270} viewBox="0 0 270 270" style={styles.svgOverlay}>
-              <G>
-                {beads.map((bead) => {
-                  const beadColor = getBeadColor(bead.index);
-                  const isCurrentActive = bead.index === completedBeadCount + 1 && isPlaying;
-
-                  if (isCurrentActive) {
-                    // Glowing/pulsing bead representation
-                    return (
-                      <Circle
-                        key={bead.index}
-                        cx={bead.x}
-                        cy={bead.y}
-                        r={8.5}
-                        fill={theme.accentBright}
-                      />
-                    );
-                  }
-
+              {/* Central Sacred Mandala Geometry matching global MandalaBG */}
+              <G stroke={theme.mandalaStroke} fill="none" opacity={isDark ? 0.35 : 0.45}>
+                <Circle cx={135} cy={135} r={95} stroke={theme.mandalaStroke} strokeWidth={0.8} />
+                <Circle cx={135} cy={135} r={86} stroke={theme.mandalaStroke} strokeWidth={0.4} />
+                <Circle cx={135} cy={135} r={66} stroke={theme.mandalaStroke} strokeWidth={0.6} />
+                <Circle cx={135} cy={135} r={44} stroke={theme.mandalaStroke} strokeWidth={0.6} />
+                <Circle cx={135} cy={135} r={20} stroke={theme.mandalaStroke} strokeWidth={0.6} />
+                {Array.from({ length: 12 }, (_, i) => {
+                  const a = (i * 30 * Math.PI) / 180;
+                  return (
+                    <Line
+                      key={i}
+                      x1={135 + Math.cos(a) * 20}
+                      y1={135 + Math.sin(a) * 20}
+                      x2={135 + Math.cos(a) * 86}
+                      y2={135 + Math.sin(a) * 86}
+                      stroke={theme.mandalaStroke}
+                      strokeWidth={0.4}
+                      opacity={0.6}
+                    />
+                  );
+                })}
+                {Array.from({ length: 8 }, (_, i) => {
+                  const a = ((i * 45 + 22.5) * Math.PI) / 180;
                   return (
                     <Circle
-                      key={bead.index}
-                      cx={bead.x}
-                      cy={bead.y}
-                      r={bead.isSumeru ? 9.5 : 5.5}
-                      fill={beadColor}
+                      key={i}
+                      cx={135 + Math.cos(a) * 66}
+                      cy={135 + Math.sin(a) * 66}
+                      r={2.5}
+                      fill={theme.mandalaStroke}
                     />
                   );
                 })}
               </G>
+
+              {/* Outer guide track */}
+              <Circle cx={135} cy={135} r={108} stroke={isDark ? 'rgba(245, 236, 216, 0.12)' : 'rgba(92, 61, 74, 0.15)'} strokeWidth={1} fill="none" />
+
+              {/* Render 36 mala beads */}
+              {beads.map((b) => {
+                const isCurrentActive = b.index === completedBeadCount;
+                const beadColor = getBeadColor(b.index);
+
+                if (isCurrentActive) {
+                  return (
+                    <G key={b.index}>
+                      {/* Pulse ring for active bead */}
+                      <Animated.View style={{ opacity: beadPulse }}>
+                        <Circle cx={b.x} cy={b.y} r={11} fill={beadColor} opacity={0.25} />
+                      </Animated.View>
+                      <Circle cx={b.x} cy={b.y} r={7.5} fill={beadColor} />
+                    </G>
+                  );
+                }
+
+                return (
+                  <Circle
+                    key={b.index}
+                    cx={b.x}
+                    cy={b.y}
+                    r={b.isSumeru ? 7 : 4.5}
+                    fill={beadColor}
+                  />
+                );
+              })}
             </Svg>
 
-            {/* Inner Ring Card (Glassmorphism / Card overlay) */}
+            {/* Center Counter Display Card */}
             <Animated.View
               style={[
                 styles.innerCard,
                 {
-                  backgroundColor: isDark ? 'rgba(26, 27, 58, 0.72)' : 'rgba(255, 245, 248, 0.85)',
-                  borderColor: isDark ? 'rgba(245, 236, 216, 0.12)' : 'rgba(92, 61, 74, 0.12)',
+                  backgroundColor: theme.surface,
+                  borderColor: theme.accentBorder,
                   transform: [{ scale: countScale }],
                 },
               ]}
             >
               <Text style={[styles.roundLabel, { color: theme.textMuted }]}>
-                ROUND {roundCount} OF 3
+                ROUND {roundCount}
               </Text>
               <Text style={[styles.counterText, { color: theme.text }]}>
                 {beadCount}
               </Text>
-              <Text style={[styles.limitLabel, { color: theme.textMuted }]}>
-                of 108 · माला
+              <Text style={[styles.limitLabel, { color: isDark ? theme.accentBright : theme.accentDeep }]}>
+                / 108 BEADS
               </Text>
             </Animated.View>
           </View>
 
-          {/* Action Prompt */}
+          {/* User Prompt */}
           <Text style={[styles.prompt, { color: theme.textMuted }]}>
-            {isPlaying ? 'Tap anywhere to advance a bead' : 'Chanting is paused'}
+            Tap anywhere to count 1 bead
           </Text>
         </View>
 
-        {/* Bottom Actions */}
+        {/* Bottom Control Bar */}
         <View style={styles.bottomBar}>
+          {/* Reset Button */}
           <Pressable
             style={[
               styles.btnReset,
               {
-                borderColor: isDark ? 'rgba(245, 236, 216, 0.18)' : 'rgba(92, 61, 74, 0.22)',
-                backgroundColor: isDark ? 'rgba(26, 27, 58, 0.4)' : 'rgba(255, 255, 255, 0.6)',
+                backgroundColor: theme.surfaceSoft,
+                borderColor: theme.cardBorder,
               },
             ]}
             onPress={handleReset}
@@ -243,6 +276,7 @@ export function MantraJaapScreen({ navigation }: Props) {
             <Text style={[styles.btnResetText, { color: theme.text }]}>Reset</Text>
           </Pressable>
 
+          {/* Pause / Resume Button */}
           <Pressable
             style={[
               styles.btnPlayPause,
@@ -250,32 +284,19 @@ export function MantraJaapScreen({ navigation }: Props) {
                 backgroundColor: isDark ? theme.accent : theme.accentDeep,
               },
             ]}
-            onPress={() => {
-              triggerHaptic();
-              setIsPlaying(!isPlaying);
-            }}
+            onPress={() => setIsPlaying(!isPlaying)}
           >
             <View style={styles.btnPlayPauseContent}>
-              {isPlaying ? (
-                <>
-                  <Svg width={14} height={14} viewBox="0 0 24 24" fill={isDark ? theme.background : '#fff'}>
-                    <Rect x={4} y={3} width={4} height={18} rx={1} />
-                    <Rect x={16} y={3} width={4} height={18} rx={1} />
-                  </Svg>
-                  <Text style={[styles.btnPlayPauseText, { color: isDark ? theme.background : '#fff' }]}>
-                    Pause · विराम
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <Svg width={14} height={14} viewBox="0 0 24 24" fill={isDark ? theme.background : '#fff'}>
-                    <Path d="M8 5v14l11-7z" />
-                  </Svg>
-                  <Text style={[styles.btnPlayPauseText, { color: isDark ? theme.background : '#fff' }]}>
-                    Resume · आरंभ
-                  </Text>
-                </>
-              )}
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill={theme.textOnAccent}>
+                {isPlaying ? (
+                  <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                ) : (
+                  <Path d="M8 5v14l11-7z" />
+                )}
+              </Svg>
+              <Text style={[styles.btnPlayPauseText, { color: theme.textOnAccent }]}>
+                {isPlaying ? 'Pause Guide' : 'Resume Guide'}
+              </Text>
             </View>
           </Pressable>
         </View>
@@ -284,7 +305,7 @@ export function MantraJaapScreen({ navigation }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: AppTheme) => StyleSheet.create({
   root: {
     flex: 1,
   },
@@ -292,7 +313,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     paddingHorizontal: 24,
-    paddingBottom: 20,
   },
   header: {
     flexDirection: 'row',
@@ -304,12 +324,11 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: theme.fonts.heading,
     fontSize: 12,
     letterSpacing: 1.5,
   },
@@ -324,13 +343,13 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   mantraDev: {
-    fontFamily: 'NotoSansDevanagari_500Medium',
+    fontFamily: theme.fonts.hindiMedium,
     fontSize: 28,
     textAlign: 'center',
     lineHeight: 40,
   },
   mantraEn: {
-    fontFamily: 'PlayfairDisplay_500Medium_Italic',
+    fontFamily: theme.fonts.serifItalic,
     fontSize: 17,
     textAlign: 'center',
     opacity: 0.85,
@@ -363,23 +382,23 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   roundLabel: {
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: theme.fonts.heading,
     fontSize: 10,
     letterSpacing: 1.5,
   },
   counterText: {
-    fontFamily: 'PlayfairDisplay_600SemiBold',
+    fontFamily: theme.fonts.serif,
     fontSize: 60,
     lineHeight: 68,
     marginVertical: 4,
   },
   limitLabel: {
-    fontFamily: 'Poppins_500Medium',
+    fontFamily: theme.fonts.medium,
     fontSize: 11,
     letterSpacing: 0.5,
   },
   prompt: {
-    fontFamily: 'Poppins_400Regular',
+    fontFamily: theme.fonts.body,
     fontSize: 14,
     textAlign: 'center',
     opacity: 0.75,
@@ -399,7 +418,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   btnResetText: {
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: theme.fonts.heading,
     fontSize: 15,
   },
   btnPlayPause: {
@@ -420,7 +439,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   btnPlayPauseText: {
-    fontFamily: 'Poppins_600SemiBold',
+    fontFamily: theme.fonts.heading,
     fontSize: 15.5,
   },
 });

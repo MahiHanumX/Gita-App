@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Path } from 'react-native-svg';
@@ -20,8 +20,9 @@ type Props = CompositeScreenProps<
 export function PracticeHomeScreen({ navigation }: Props) {
   const { data } = usePracticeHub();
   const t = useTranslation();
-  const { theme } = useTheme();
+  const { theme, resolvedMode } = useTheme();
   const styles = useMemo(() => getStyles(theme), [theme]);
+  const isLight = resolvedMode === 'light';
 
   if (!data) return null;
 
@@ -40,17 +41,17 @@ export function PracticeHomeScreen({ navigation }: Props) {
           })}
         >
           <LinearGradient
-            colors={[theme.accentSoft, `${theme.accentSoft}55`]}
+            colors={[theme.accentSoft, isLight ? theme.blush : `${theme.accentSoft}55`]}
             style={styles.suggestionInner}
           >
             <View style={styles.playIcon}>
               <Svg width={26} height={26} viewBox="0 0 24 24" fill="none">
-                <Circle cx={12} cy={12} r={9} stroke={theme.accent} strokeWidth={1.5} opacity={0.5} />
-                <Path d="M9 8 v 8 l 7 -4 z" fill={theme.accent} />
+                <Circle cx={12} cy={12} r={9} stroke={isLight ? theme.accentDeep : theme.accent} strokeWidth={1.5} opacity={0.5} />
+                <Path d="M9 8 v 8 l 7 -4 z" fill={isLight ? theme.accentDeep : theme.accent} />
               </Svg>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.suggestedLabel}>{suggestion.label}</Text>
+              <Text style={[styles.suggestedLabel, { color: isLight ? theme.accentDeep : theme.accent }]}>{suggestion.label}</Text>
               <Text style={styles.suggestedTitle}>{suggestion.title}</Text>
               <Text style={styles.suggestedHi}>{suggestion.hindiSubtitle}</Text>
             </View>
@@ -60,29 +61,35 @@ export function PracticeHomeScreen({ navigation }: Props) {
         {/* Explore grid */}
         <Text style={styles.sectionLabel}>{t.common.explore}</Text>
         <View style={styles.grid}>
-          {tiles.map((tile) => (
-            <Pressable
-              key={tile.id}
-              style={({ pressed }) => [styles.tilePressable, pressed && { opacity: 0.85 }]}
-              onPress={() => {
-                if (tile.id === 'mantra') {
-                  navigation.navigate('MantraLibrary');
-                } else if (tile.id === 'breathwork') {
-                  navigation.navigate('BreathworkLibrary');
-                } else if (tile.id === 'yoganidra') {
-                  navigation.navigate('YogaNidraLibrary');
-                } else {
-                  navigation.navigate('MeditationLibrary');
-                }
-              }}
-            >
-              <LinearGradient colors={tile.gradient} style={styles.tile}>
-                <Text style={styles.tileHi}>{tile.hi}</Text>
-                <Text style={styles.tileEn}>{tile.en}</Text>
-                <Text style={styles.tileCount}>{tile.count}</Text>
-              </LinearGradient>
-            </Pressable>
-          ))}
+          {tiles.map((tile) => {
+            const tileGradient = isLight
+              ? ([theme.surface, theme.surfaceSoft] as const)
+              : (tile.gradient as readonly [string, string, ...string[]]);
+
+            return (
+              <Pressable
+                key={tile.id}
+                style={({ pressed }) => [styles.tilePressable, pressed && { opacity: 0.85 }]}
+                onPress={() => {
+                  if (tile.id === 'mantra') {
+                    navigation.navigate('MantraLibrary');
+                  } else if (tile.id === 'breathwork') {
+                    navigation.navigate('BreathworkLibrary');
+                  } else if (tile.id === 'nidra' || tile.id === 'yoganidra') {
+                    navigation.navigate('YogaNidraLibrary');
+                  } else {
+                    navigation.navigate('MeditationLibrary');
+                  }
+                }}
+              >
+                <LinearGradient colors={tileGradient} style={styles.tile}>
+                  <Text style={[styles.tileHi, isLight && { color: theme.accentDeep }]}>{tile.hi}</Text>
+                  <Text style={styles.tileEn}>{tile.en}</Text>
+                  <Text style={styles.tileCount}>{tile.count}</Text>
+                </LinearGradient>
+              </Pressable>
+            );
+          })}
         </View>
       </ScrollView>
     </LightShell>
@@ -153,11 +160,13 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     borderRadius: 18,
     padding: 16,
     minHeight: 120,
+    borderWidth: 1,
+    borderColor: theme.cardBorder,
   },
   tileHi: {
     fontFamily: theme.fonts.hindiMedium,
     fontSize: 18,
-    color: theme.text,
+    color: theme.accentBright,
   },
   tileEn: {
     marginTop: 4,

@@ -14,6 +14,8 @@ export function SessionDetailScreen() {
   const styles = useMemo(() => getStyles(theme), [theme]);
   const isLight = resolvedMode === 'light';
 
+  const accentColor = isLight ? theme.accentDeep : theme.accentBright;
+
   const titleEn = route.params?.titleEn || 'Breath of the Warrior';
   const titleHi = route.params?.titleHi || 'वीर श्वास';
 
@@ -27,7 +29,7 @@ export function SessionDetailScreen() {
 
   return (
     <View style={styles.container}>
-      <MandalaBG opacity={isLight ? 0.08 : 0.04} />
+      <MandalaBG />
       
       {/* Hero backdrop image area */}
       <LinearGradient
@@ -70,7 +72,7 @@ export function SessionDetailScreen() {
 
           {/* Title */}
           <View style={styles.titleArea}>
-            <Text style={styles.suggestedTag}>Suggested for today</Text>
+            <Text style={[styles.suggestedTag, { color: accentColor }]}>Suggested for today</Text>
             <Text style={styles.titleEn}>{titleEn}</Text>
             <Text style={styles.titleHi}>{titleHi}</Text>
           </View>
@@ -83,7 +85,7 @@ export function SessionDetailScreen() {
               { icon: '☾', label: 'Anytime' },
             ].map((p, i) => (
               <View key={i} style={styles.metaPill}>
-                <Text style={styles.metaPillIcon}>{p.icon}</Text>
+                <Text style={[styles.metaPillIcon, { color: accentColor }]}>{p.icon}</Text>
                 <Text style={styles.metaPillLabel}>{p.label}</Text>
               </View>
             ))}
@@ -102,7 +104,7 @@ export function SessionDetailScreen() {
             <View style={styles.chaptersList}>
               {chapters.map((c, i) => (
                 <View key={i} style={[styles.chapterRow, i === chapters.length - 1 && { borderBottomWidth: 0 }]}>
-                  <Text style={styles.chapterTime}>{c.time}</Text>
+                  <Text style={[styles.chapterTime, { color: accentColor }]}>{c.time}</Text>
                   <View style={styles.chapterInfo}>
                     <Text style={styles.chapterLabel}>{c.label}</Text>
                     <Text style={styles.chapterHi}>{c.hi}</Text>
@@ -153,7 +155,7 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(15,16,43,0.5)',
+    backgroundColor: theme.iconButtonBg,
     borderWidth: 1,
     borderColor: theme.cardBorder,
     alignItems: 'center',
@@ -194,7 +196,6 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
   suggestedTag: {
     fontFamily: theme.fonts.heading,
     fontSize: 11,
-    color: theme.accentBright,
     letterSpacing: 2,
     textTransform: 'uppercase',
   },
@@ -230,7 +231,6 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     gap: 5,
   },
   metaPillIcon: {
-    color: theme.accentBright,
     fontSize: 12,
   },
   metaPillLabel: {
@@ -281,7 +281,6 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     width: 44,
     fontFamily: theme.fonts.heading,
     fontSize: 12,
-    color: theme.accentBright,
   },
   chapterInfo: {
     flex: 1,

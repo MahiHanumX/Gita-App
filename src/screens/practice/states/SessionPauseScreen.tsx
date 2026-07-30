@@ -13,10 +13,12 @@ export function SessionPauseScreen() {
   const styles = useMemo(() => getStyles(theme), [theme]);
   const isLight = resolvedMode === 'light';
 
+  const accentColor = isLight ? theme.accentDeep : theme.accentBright;
+
   return (
     <View style={styles.container}>
-      <MandalaBG opacity={isLight ? 0.05 : 0.03} />
-      <View style={styles.scrim} />
+      <MandalaBG />
+      <View style={[styles.scrim, { backgroundColor: isLight ? 'rgba(248, 249, 255, 0.65)' : 'rgba(15, 16, 43, 0.65)' }]} />
 
       <View style={styles.content}>
         <View style={styles.header}>
@@ -29,7 +31,7 @@ export function SessionPauseScreen() {
 
         {/* Paused label */}
         <View style={styles.titleArea}>
-          <Text style={styles.pausedTag}>Paused · विराम</Text>
+          <Text style={[styles.pausedTag, { color: accentColor }]}>Paused · विराम</Text>
           <Text style={styles.titleEn}>Breath of the Warrior</Text>
           <Text style={styles.titleHi}>वीर श्वास</Text>
         </View>
@@ -40,7 +42,7 @@ export function SessionPauseScreen() {
             <Text style={styles.timeBig}>3:12</Text>
             <Text style={styles.timeSub}>of 8:00 · 40% complete</Text>
             <View style={styles.progressBar}>
-              <View style={[styles.progressFill, { width: '40%', backgroundColor: theme.accent }]} />
+              <View style={[styles.progressFill, { width: '40%', backgroundColor: accentColor }]} />
             </View>
           </View>
         </View>
@@ -48,11 +50,11 @@ export function SessionPauseScreen() {
         {/* Verse */}
         <View style={styles.verseArea}>
           <View style={[styles.verseCard, { backgroundColor: theme.surfaceSoft }]}>
-            <Text style={styles.verseTag}>Rest in this · विश्राम</Text>
+            <Text style={[styles.verseTag, { color: accentColor }]}>Rest in this · विश्राम</Text>
             <Text style={styles.verseText}>
               "When your intellect crosses beyond the tangle of delusion — then you will attain indifference to what is heard and what is yet to be heard."
             </Text>
-            <Text style={styles.verseSource}>— Bhagavad Gita 2.52</Text>
+            <Text style={[styles.verseSource, { color: accentColor }]}>— Bhagavad Gita 2.52</Text>
           </View>
         </View>
 
@@ -85,7 +87,6 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
   },
   scrim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(15,16,43,0.55)',
   },
   content: {
     flex: 1,
@@ -113,7 +114,6 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
   pausedTag: {
     fontFamily: theme.fonts.heading,
     fontSize: 11,
-    color: theme.accentBright,
     letterSpacing: 3,
     textTransform: 'uppercase',
   },
@@ -180,7 +180,6 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
   verseTag: {
     fontFamily: theme.fonts.heading,
     fontSize: 10,
-    color: theme.accentBright,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     marginBottom: 8,
@@ -195,7 +194,6 @@ const getStyles = (theme: AppTheme) => StyleSheet.create({
     marginTop: 8,
     fontFamily: theme.fonts.medium,
     fontSize: 11,
-    color: theme.accentBright,
   },
   controlsArea: {
     paddingHorizontal: 24,

@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, Pressable, Animated, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
-import { useTheme } from '../../theme';
+import Svg, { Circle, G, Line, Path } from 'react-native-svg';
+import { useTheme, AppTheme } from '../../theme';
 import { MandalaBG } from '../../components/MandalaBG';
-import { PALETTE } from '../../theme/palette';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/types';
 
@@ -52,8 +51,7 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
     };
   }, [isPlaying]);
 
-  // Breathing Guide Loop (independent of play state or linked)
-  // Let's run it continuously or when playing. Linking it makes sense, but breathing apps often let it pulse always. Let's run it whenever the screen is active.
+  // Breathing Guide Loop
   useEffect(() => {
     const timer = setInterval(() => {
       setBreathSeconds((prev) => {
@@ -66,7 +64,6 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
             if (currentState === 'inhale') {
               nextState = 'hold_in';
               nextSeconds = 4;
-              // Hold state: keep it large and glowing
               Animated.parallel([
                 Animated.timing(breathAnim, { toValue: 1.25, duration: 200, useNativeDriver: true }),
                 Animated.timing(glowAnim, { toValue: 0.9, duration: 200, useNativeDriver: true }),
@@ -74,7 +71,6 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
             } else if (currentState === 'hold_in') {
               nextState = 'exhale';
               nextSeconds = 4;
-              // Exhale state: shrink circle and lower glow
               Animated.parallel([
                 Animated.timing(breathAnim, { toValue: 0.9, duration: 4000, useNativeDriver: true }),
                 Animated.timing(glowAnim, { toValue: 0.35, duration: 4000, useNativeDriver: true }),
@@ -82,7 +78,6 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
             } else if (currentState === 'exhale') {
               nextState = 'hold_out';
               nextSeconds = 4;
-              // Hold out: keep it small
               Animated.parallel([
                 Animated.timing(breathAnim, { toValue: 0.9, duration: 200, useNativeDriver: true }),
                 Animated.timing(glowAnim, { toValue: 0.2, duration: 200, useNativeDriver: true }),
@@ -90,7 +85,6 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
             } else if (currentState === 'hold_out') {
               nextState = 'inhale';
               nextSeconds = 4;
-              // Inhale state: expand circle and increase glow
               Animated.parallel([
                 Animated.timing(breathAnim, { toValue: 1.25, duration: 4000, useNativeDriver: true }),
                 Animated.timing(glowAnim, { toValue: 0.8, duration: 4000, useNativeDriver: true }),
@@ -105,7 +99,6 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
       });
     }, 1000);
 
-    // Initial animation triggers
     Animated.parallel([
       Animated.timing(breathAnim, { toValue: 1.25, duration: 4000, useNativeDriver: true }),
       Animated.timing(glowAnim, { toValue: 0.8, duration: 4000, useNativeDriver: true }),
@@ -114,14 +107,12 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
     return () => clearInterval(timer);
   }, []);
 
-  // Format seconds to MM:SS
   const formatTime = (secs: number) => {
     const m = Math.floor(secs / 60);
     const s = secs % 60;
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  // Skip handlers
   const handleRewind15 = () => {
     setCurrentTime((prev) => Math.max(0, prev - 15));
   };
@@ -144,34 +135,25 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
   };
 
   const labels = getBreathLabel();
-
-  // Progress Bar Ratio
   const progressRatio = currentTime / totalDuration;
 
   return (
     <View style={[styles.root, { backgroundColor: theme.background }]}>
       {/* Background Mandala */}
-      <MandalaBG
-        opacity={isDark ? 0.055 : 0.03}
-        from={theme.gradientStart}
-        via={theme.gradientMid}
-        to={theme.gradientEnd}
-        stroke={theme.mandalaStroke}
-        glowColor={theme.accentSoft}
-      />
+      <MandalaBG />
 
       <SafeAreaView style={styles.container}>
         {/* Custom Header */}
         <View style={styles.header}>
-          <Pressable style={styles.headerBtn} onPress={() => navigation.goBack()}>
+          <Pressable style={[styles.headerBtn, { backgroundColor: theme.iconButtonBg }]} onPress={() => navigation.goBack()}>
             <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
               <Path d="M6 9l6 6 6-6" stroke={theme.text} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
             </Svg>
           </Pressable>
 
-          <Text style={[styles.headerTitle, { color: theme.text }]}>MEDITATION</Text>
+          <Text style={[styles.headerTitle, { color: theme.text, fontFamily: theme.fonts.heading }]}>MEDITATION</Text>
 
-          <Pressable style={styles.headerBtn} onPress={() => {}}>
+          <Pressable style={[styles.headerBtn, { backgroundColor: theme.iconButtonBg }]} onPress={() => {}}>
             <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
               <Circle cx={12} cy={5} r={2} fill={theme.text} />
               <Circle cx={12} cy={12} r={2} fill={theme.text} />
@@ -199,19 +181,56 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
               style={[
                 styles.breatherCircle,
                 {
-                  backgroundColor: isDark ? '#1a1b3a' : '#FFF9FB',
-                  borderColor: isDark ? 'rgba(244, 194, 87, 0.4)' : 'rgba(217, 134, 154, 0.4)',
+                  backgroundColor: theme.surface,
+                  borderColor: theme.accentBorder,
                   transform: [{ scale: breathAnim }],
                 },
               ]}
             >
-              <Text style={[styles.breathInstruction, { color: theme.textMuted }]}>
+              {/* Embedded Sacred Mandala Geometry matching global MandalaBG */}
+              <Svg width={200} height={200} viewBox="0 0 200 200" style={StyleSheet.absoluteFill}>
+                <G stroke={theme.mandalaStroke} fill="none" opacity={isDark ? 0.35 : 0.45}>
+                  <Circle cx={100} cy={100} r={84} stroke={theme.mandalaStroke} strokeWidth={0.8} />
+                  <Circle cx={100} cy={100} r={72} stroke={theme.mandalaStroke} strokeWidth={0.4} />
+                  <Circle cx={100} cy={100} r={52} stroke={theme.mandalaStroke} strokeWidth={0.6} />
+                  <Circle cx={100} cy={100} r={32} stroke={theme.mandalaStroke} strokeWidth={0.6} />
+                  {Array.from({ length: 12 }, (_, i) => {
+                    const a = (i * 30 * Math.PI) / 180;
+                    return (
+                      <Line
+                        key={i}
+                        x1={100 + Math.cos(a) * 16}
+                        y1={100 + Math.sin(a) * 16}
+                        x2={100 + Math.cos(a) * 72}
+                        y2={100 + Math.sin(a) * 72}
+                        stroke={theme.mandalaStroke}
+                        strokeWidth={0.4}
+                        opacity={0.6}
+                      />
+                    );
+                  })}
+                  {Array.from({ length: 8 }, (_, i) => {
+                    const a = ((i * 45 + 22.5) * Math.PI) / 180;
+                    return (
+                      <Circle
+                        key={i}
+                        cx={100 + Math.cos(a) * 52}
+                        cy={100 + Math.sin(a) * 52}
+                        r={2.5}
+                        fill={theme.mandalaStroke}
+                      />
+                    );
+                  })}
+                </G>
+              </Svg>
+
+              <Text style={[styles.breathInstruction, { color: theme.textMuted, fontFamily: theme.fonts.heading }]}>
                 {labels.en}
               </Text>
-              <Text style={[styles.breathTimer, { color: theme.text }]}>
+              <Text style={[styles.breathTimer, { color: theme.text, fontFamily: theme.fonts.serif }]}>
                 {breathSeconds}
               </Text>
-              <Text style={[styles.breathInstructionHi, { color: isDark ? theme.accentBright : theme.accentDeep }]}>
+              <Text style={[styles.breathInstructionHi, { color: isDark ? theme.accentBright : theme.accentDeep, fontFamily: theme.fonts.hindiMedium }]}>
                 {labels.hi}
               </Text>
             </Animated.View>
@@ -222,10 +241,10 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
         <View style={styles.playerSection}>
           {/* Track Info */}
           <View style={styles.infoWrapper}>
-            <Text style={[styles.titleEn, { color: theme.text }]}>
+            <Text style={[styles.titleEn, { color: theme.text, fontFamily: theme.fonts.serifItalic }]}>
               {titleEn}
             </Text>
-            <Text style={[styles.titleHi, { color: isDark ? theme.accentBright : theme.accentDeep }]}>
+            <Text style={[styles.titleHi, { color: isDark ? theme.accentBright : theme.accentDeep, fontFamily: theme.fonts.hindiMedium }]}>
               {titleHi}
             </Text>
           </View>
@@ -249,8 +268,8 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
                     styles.progressThumb,
                     {
                       left: `${progressRatio * 100}%`,
-                      backgroundColor: isDark ? '#fff2c9' : theme.accentDeep,
-                      borderColor: isDark ? theme.accentDeep : '#FFF9FB',
+                      backgroundColor: theme.surface,
+                      borderColor: isDark ? theme.accentBright : theme.accentDeep,
                     },
                   ]}
                 />
@@ -258,10 +277,10 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
             </View>
 
             <View style={styles.timeCounterRow}>
-              <Text style={[styles.timeLabel, { color: theme.textMuted }]}>
+              <Text style={[styles.timeLabel, { color: theme.textMuted, fontFamily: theme.fonts.body }]}>
                 {formatTime(currentTime)}
               </Text>
-              <Text style={[styles.timeLabel, { color: theme.textMuted }]}>
+              <Text style={[styles.timeLabel, { color: theme.textMuted, fontFamily: theme.fonts.body }]}>
                 {formatTime(totalDuration)}
               </Text>
             </View>
@@ -274,7 +293,7 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
               <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
                 <Path d="M12.5 3a9 9 0 1 0 7 3.5M19.5 3v4.5H15" stroke={theme.text} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
               </Svg>
-              <Text style={[styles.skipCounterText, { color: theme.text }]}>15</Text>
+              <Text style={[styles.skipCounterText, { color: theme.text, fontFamily: theme.fonts.heading }]}>15</Text>
             </Pressable>
 
             {/* Skip Back */}
@@ -296,11 +315,11 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
               onPress={() => setIsPlaying(!isPlaying)}
             >
               {isPlaying ? (
-                <Svg width={24} height={24} viewBox="0 0 24 24" fill={isDark ? theme.background : '#fff'}>
+                <Svg width={24} height={24} viewBox="0 0 24 24" fill={theme.textOnAccent}>
                   <Path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
                 </Svg>
               ) : (
-                <Svg width={24} height={24} viewBox="0 0 24 24" fill={isDark ? theme.background : '#fff'} style={{ marginLeft: 3 }}>
+                <Svg width={24} height={24} viewBox="0 0 24 24" fill={theme.textOnAccent} style={{ marginLeft: 3 }}>
                   <Path d="M8 5v14l11-7z" />
                 </Svg>
               )}
@@ -318,7 +337,7 @@ export function MeditationSessionScreen({ navigation, route }: Props) {
               <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
                 <Path d="M11.5 3a9 9 0 1 1-7 3.5M4.5 3v4.5H9" stroke={theme.text} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
               </Svg>
-              <Text style={[styles.skipCounterText, { color: theme.text }]}>15</Text>
+              <Text style={[styles.skipCounterText, { color: theme.text, fontFamily: theme.fonts.heading }]}>15</Text>
             </Pressable>
           </View>
         </View>
@@ -347,12 +366,10 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   headerTitle: {
-    fontFamily: 'Poppins_600SemiBold',
     fontSize: 12,
     letterSpacing: 1.5,
   },
@@ -390,17 +407,14 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   breathInstruction: {
-    fontFamily: 'Poppins_600SemiBold',
     fontSize: 11,
     letterSpacing: 1.8,
   },
   breathTimer: {
-    fontFamily: 'PlayfairDisplay_600SemiBold',
     fontSize: 66,
     marginVertical: 4,
   },
   breathInstructionHi: {
-    fontFamily: 'NotoSansDevanagari_500Medium',
     fontSize: 14,
     letterSpacing: 0.5,
   },
@@ -414,12 +428,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   titleEn: {
-    fontFamily: 'PlayfairDisplay_500Medium_Italic',
     fontSize: 27,
     textAlign: 'center',
   },
   titleHi: {
-    fontFamily: 'NotoSansDevanagari_500Medium',
     fontSize: 16,
     textAlign: 'center',
     opacity: 0.85,
@@ -456,7 +468,6 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   timeLabel: {
-    fontFamily: 'Poppins_400Regular',
     fontSize: 11.5,
   },
   controlRow: {
@@ -476,7 +487,6 @@ const styles = StyleSheet.create({
   skipCounterText: {
     position: 'absolute',
     fontSize: 7.5,
-    fontFamily: 'Poppins_600SemiBold',
     top: 17,
   },
   btnPlay: {
@@ -492,3 +502,4 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 });
+

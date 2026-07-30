@@ -60,6 +60,9 @@ export function SessionRow({ hi, en, teacher, duration, tag, icon, accent, isNew
   const { theme } = useTheme();
   const styles = useMemo(() => getRowStyles(theme), [theme]);
 
+  const isLight = theme.mode === 'light';
+  const activeAccent = isLight ? theme.accentDeep : theme.accentBright;
+
   return (
     <Pressable style={({ pressed }) => [styles.container, pressed && { opacity: 0.85 }]} onPress={onPress}>
       <LinearGradient colors={accent} style={styles.iconContainer}>
@@ -89,15 +92,15 @@ export function SessionRow({ hi, en, teacher, duration, tag, icon, accent, isNew
           {tag && (
             <>
               <Text style={styles.metaDot}>·</Text>
-              <Text style={[styles.metaText, { color: theme.accentBright }]}>{tag}</Text>
+              <Text style={[styles.metaText, { color: activeAccent }]}>{tag}</Text>
             </>
           )}
         </View>
       </View>
       
       <Pressable style={styles.favButton}>
-        <Svg width="16" height="16" viewBox="0 0 24 24" fill={isFav ? theme.accentBright : 'none'}>
-          <Path d="M12 4 C 8 4, 6 7, 6 10 c 0 4 6 8 6 8 s 6 -4 6 -8 c 0 -3 -2 -6 -6 -6 z" stroke={isFav ? theme.accentBright : theme.textMuted} strokeWidth="1.6" />
+        <Svg width="16" height="16" viewBox="0 0 24 24" fill={isFav ? activeAccent : 'none'}>
+          <Path d="M12 4 C 8 4, 6 7, 6 10 c 0 4 6 8 6 8 s 6 -4 6 -8 c 0 -3 -2 -6 -6 -6 z" stroke={isFav ? activeAccent : theme.textMuted} strokeWidth="1.6" />
         </Svg>
       </Pressable>
     </Pressable>
@@ -108,8 +111,8 @@ interface LibraryFrameProps {
   hi: string;
   en: string;
   count: string;
-  tint: string;
-  glow: string;
+  tint?: string;
+  glow?: string;
   subtitle?: string;
   filters?: { label: string; active: boolean }[];
   children: React.ReactNode;
@@ -121,10 +124,11 @@ export function LibraryFrame({ hi, en, count, tint, glow, subtitle, filters, chi
   const styles = useMemo(() => getFrameStyles(theme), [theme]);
 
   const isLight = resolvedMode === 'light';
+  const headerTint = tint || (isLight ? theme.accentDeep : theme.accentBright);
 
   return (
     <View style={styles.container}>
-      <MandalaBG opacity={isLight ? 0.08 : 0.04} />
+      <MandalaBG glowColor={glow} />
       
       <View style={styles.content}>
         {/* Header */}
@@ -144,7 +148,7 @@ export function LibraryFrame({ hi, en, count, tint, glow, subtitle, filters, chi
 
         {/* Title */}
         <View style={styles.titleArea}>
-          <Text style={[styles.hiText, { color: tint || theme.text }]}>{hi}</Text>
+          <Text style={[styles.hiText, { color: headerTint }]}>{hi}</Text>
           <Text style={styles.enText}>
             {en} <Text style={styles.countText}>· {count}</Text>
           </Text>
@@ -208,7 +212,7 @@ const getRowStyles = (theme: AppTheme) => StyleSheet.create({
     inset: -3,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: '#7fd196',
+    borderColor: theme.mode === 'light' ? theme.accentDeep : theme.accentBright,
   },
   infoContainer: {
     flex: 1,
@@ -231,7 +235,7 @@ const getRowStyles = (theme: AppTheme) => StyleSheet.create({
     backgroundColor: theme.accentSoft,
   },
   newBadgeText: {
-    color: theme.accentBright,
+    color: theme.mode === 'light' ? theme.accentDeep : theme.accentBright,
     fontFamily: theme.fonts.heading,
     fontSize: 9,
     letterSpacing: 0.5,
@@ -239,7 +243,7 @@ const getRowStyles = (theme: AppTheme) => StyleSheet.create({
   titleHi: {
     fontFamily: theme.fonts.hindi,
     fontSize: 12,
-    color: theme.accentBright,
+    color: theme.mode === 'light' ? theme.accentDeep : theme.accentBright,
     marginTop: 1,
   },
   metaRow: {
