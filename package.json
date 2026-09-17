@@ -25,13 +25,17 @@
   "devDependencies": {
     "@types/react": "~19.1.10",
     "@types/react-native": "^0.72.8",
+    "native-sim": "^0.1.0",
     "typescript": "~5.9.2"
   },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "sim": "native-sim up --public --minutes 45",
+    "sim:doctor": "native-sim doctor",
+    "sim:down": "native-sim down"
   },
   "private": true
 }
