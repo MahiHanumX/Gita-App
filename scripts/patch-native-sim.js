@@ -19,6 +19,13 @@ if (fs.existsSync(procPath)) {
       "const binary = process.platform === 'win32' ? 'where' : 'which';\n  return sh(binary, [cmd]).ok || sh(cmd, ['--version']).ok;"
     );
   }
+
+  if (content.includes("spawn('open', [url]")) {
+    content = content.replace(
+      "spawn('open', [url]",
+      "spawn(process.platform === 'win32' ? 'cmd' : 'open', process.platform === 'win32' ? ['/c', 'start', url] : [url]"
+    );
+  }
   fs.writeFileSync(procPath, content, 'utf8');
   console.log('✓ Patched native-sim proc.js for Windows');
 }
